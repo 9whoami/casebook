@@ -34,10 +34,9 @@ class ApiMethods(Grab):
         config = Conf(section='api')
         self.base_url = config.main_url
 
-        super().__init__()
+        super().__init__(timeout=60)
 
-    def request(self, url:str='', origin:'json=1 or body=0'=1, **kwargs:'post data dict') -> dict:
-
+    def api_request(self, url:str='', origin:'json=1 or body=0'=1, **kwargs:'post data dict') -> dict:
         try:
             url = self.base_url + url
             self.go(url, post=kwargs)
