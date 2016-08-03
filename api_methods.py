@@ -45,3 +45,33 @@ class ApiMethods(Grab):
             response = dict(error=e)
 
         return response
+
+
+class CasebookAPI(ApiMethods):
+    def login(self, email: str, passwd: str) -> bool:
+        url = 'Account/LogOn'
+        post_data = {
+            'UserName': email,  # 'nemotest@gmail.com',
+            'Password': passwd, # 'engrave',
+            'RememberMe': True,
+            'SystemName': 'sps'
+        }
+
+        response = self.api_request(url=url, **post_data)
+        return bool(response.get('Success'))
+
+    def mob_search(self, name: str) -> dict:
+        url = '/Search/Sides?name={}'.format(name)
+        return self.api_request(url=url)
+    
+    def web_search(self, name: str) -> dict:
+        post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": 2, "count": 30}
+        url = 'Search/Sides'
+
+        return self.api_request(url=url, **post_data)
+
+    def accounting_stat(self, inn: str) -> dict:
+        url = 'Card/AccountingStat'
+        post_data = {"inn": inn}
+
+        return self.api_request(url=url, **post_data)

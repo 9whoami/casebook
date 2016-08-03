@@ -1,34 +1,56 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import pickle
 
-from api_methods import ApiMethods
+from api_methods import CasebookAPI
+from base64 import b64encode, b64decode
+import simplejson
 
 __project__ = 'casebook'
 __date__ = ''
 __author__ = 'andreyteterevkov'
 
-api = ApiMethods()
 
-url = 'Account/LogOn'
-post_data = {
-    'UserName': 'nemotest@gmail.com',
-    'Password': 'engrave',
-    'RememberMe': True,
-    'SystemName': 'sps'
-}
+def char_escape(in_str: str) -> str:
+    escape_chars = ['"', "'", '(', ')']
+    out_str = ''
+    for char in in_str:
+        if char in escape_chars:
+            out_str += '\\'
+        out_str += char
+    return out_str
 
-print(api.request(url=url, **post_data))
-print(api.request(url='/Search/Sides?name=%D0%9B%D1%83%D0%BA%D0%BE%D0%B9%D0%BB'))
 
-post_data = {
-    "Address": "198095, Г САНКТ-ПЕТЕРБУРГ, УЛ ТРЕФОЛЕВА, 9 ЛИТЕР А ПОМ 11Н",
-    "Inn": "7805441145",
-    "Name": 'ЛИКВИДАЦИОННАЯ КОМИССИЯ ООО "Мир тканей" (НАЗНАЧЕНИЕ ЛИКВИДАТОРА)',
-    "Ogrn": "1077847617440",
-    "Okpo": "82231048",
-    "IsPhysical": False,
-    "OrganizationId": 0,
-    "IsUnique": False
-}
+def store_backup(obj, dmp_file='obj.dmp'):
+    with open(dmp_file, 'wb') as f:
+        pickle.dump(obj=obj, file=f, protocol=-1)
 
-print(api.request(url='Card/BusinessCard', **post_data))
+
+def load_backup(dmp_file='obj.dmp'):
+    try:
+        with open(dmp_file, 'rb') as f:
+            obj = pickle.load(file=f)
+    except Exception:
+        obj = None
+    finally:
+        return obj
+
+
+api = CasebookAPI()
+
+if not api.login(email='nemotest@gmail.com', passwd='engrave'):
+    raise SystemExit('Не удалось войти')
+
+company = api.web_search(name='лукоил')
+
+# company = load_backup()
+
+if company.get('error') or company.get('Success') is False:
+    print(company)
+else:
+    # target_company_info = {key: company['Result']['Items'][1].get(key) for key in ["Address", "Name", "Ogrn", "Okpo", "IsPhysical", "OrganizationId", "IsUnique"]}
+    # print(target_company_info['Name'])
+    # target_company_info = simplejson.dumps(target_company_info)
+    # b64encode(target_company_info.encode('utf-8'))
+    inn = str(company['Result']['Items'][1]['Inn'])
+    print(api.accounting_stat(inn))
