@@ -65,13 +65,36 @@ class CasebookAPI(ApiMethods):
         return self.api_request(url=url)
     
     def web_search(self, name: str) -> dict:
-        post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": 2, "count": 30}
+        post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": 1, "count": 30}
         url = 'Search/Sides'
 
         return self.api_request(url=url, **post_data)
 
-    def accounting_stat(self, inn: str) -> dict:
+    def accounting_stat(self, inn: str, year_from: int=0, year_to: int=0) -> dict:
         url = 'Card/AccountingStat'
+        # {"inn":"5433178674","yearFrom":2009,"yearTo":2009}
         post_data = {"inn": inn}
 
+        if year_from:
+            post_data['yearFrom'] = year_from
+            post_data['yearTo'] = year_to if year_to else year_from
+
         return self.api_request(url=url, **post_data)
+
+    def get_egrul_link(self):
+        url = 'Card/Excerpt?'
+        # Inn:7743507562
+        # Name:АВТОНОМНАЯ НЕКОММЕРЧЕСКАЯ ОРГАНИЗАЦИЯ "ФОНД РАЗВИТИЯ ПАРАЛИМПИЙСКОГО ДВИЖЕНИЯ РОССИИ, СПЕЦНАЗА, МВД, ФСБ И МО РФ"
+        # ShortName:АНО "ФОНД РАЗВИТИЯ ПАРАЛИМПИЙСКОГО ДВИЖЕНИЯ РОССИИ, СПЕЦНАЗА, МВД, ФСБ И МО РФ"
+        # Address:125502, ГОРОД МОСКВА, УЛИЦА ПЕТРОЗАВОДСКАЯ, Д. 11 / 3
+        # Ogrn:1037739863810
+        # Okpo:70089674
+        # IsUnique:false
+        # IsBranch:false
+        # OrganizationId:0
+        # OrganizationDictId:
+        # StorageId:5858553
+        # IsNotPrecise:
+        # HeadFio:
+        # StatusId:0
+        # useCache:true

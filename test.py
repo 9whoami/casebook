@@ -27,6 +27,7 @@ def store_backup(obj, dmp_file='obj.dmp'):
 
 
 def load_backup(dmp_file='obj.dmp'):
+    obj = None
     try:
         with open(dmp_file, 'rb') as f:
             obj = pickle.load(file=f)
@@ -48,9 +49,12 @@ company = api.web_search(name='лукоил')
 if company.get('error') or company.get('Success') is False:
     print(company)
 else:
-    # target_company_info = {key: company['Result']['Items'][1].get(key) for key in ["Address", "Name", "Ogrn", "Okpo", "IsPhysical", "OrganizationId", "IsUnique"]}
+    # target_company_info = {key: company['Result']['Items'][6].get(key) for key in ["Address", "Name", "Ogrn", "Okpo", "IsPhysical", "OrganizationId", "IsUnique"]}
     # print(target_company_info['Name'])
     # target_company_info = simplejson.dumps(target_company_info)
-    # b64encode(target_company_info.encode('utf-8'))
-    inn = str(company['Result']['Items'][1]['Inn'])
-    print(api.accounting_stat(inn))
+    # print(b64encode(target_company_info.encode('utf-8')))
+    # print(company['Result']['Items'][6])
+    for x in company['Result']['Items']:
+        inn = str(x['Inn'])
+        stat = api.accounting_stat(inn)
+        print(stat['Result']['AvailableDateTimeRanges'])
