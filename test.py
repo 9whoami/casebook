@@ -49,7 +49,7 @@ company = api.sides_search(name='лукоил')
 if company.get('error') or company.get('Success') is False:
     print(company)
 else:
-    x = company['Result']['Items'][0]
-    buisnes_card = api.get_egrul_link(**x)
-    print(buisnes_card)
+    x = company['Result']['Items'][2]
+    stat = api.get_buisnes_card(**x)
+    print(stat)
 # '7743523927'
