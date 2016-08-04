@@ -42,19 +42,14 @@ api = CasebookAPI()
 if not api.login(email='nemotest@gmail.com', passwd='engrave'):
     raise SystemExit('Не удалось войти')
 
-company = api.web_search(name='лукоил')
+company = api.sides_search(name='лукоил')
 
 # company = load_backup()
 
 if company.get('error') or company.get('Success') is False:
     print(company)
 else:
-    # target_company_info = {key: company['Result']['Items'][6].get(key) for key in ["Address", "Name", "Ogrn", "Okpo", "IsPhysical", "OrganizationId", "IsUnique"]}
-    # print(target_company_info['Name'])
-    # target_company_info = simplejson.dumps(target_company_info)
-    # print(b64encode(target_company_info.encode('utf-8')))
-    # print(company['Result']['Items'][6])
-    for x in company['Result']['Items']:
-        inn = str(x['Inn'])
-        stat = api.accounting_stat(inn)
-        print(stat['Result']['AvailableDateTimeRanges'])
+    x = company['Result']['Items'][0]
+    buisnes_card = api.get_egrul_link(**x)
+    print(buisnes_card)
+# '7743523927'

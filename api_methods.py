@@ -60,17 +60,13 @@ class CasebookAPI(ApiMethods):
         response = self.api_request(url=url, **post_data)
         return bool(response.get('Success'))
 
-    def mob_search(self, name: str) -> dict:
-        url = '/Search/Sides?name={}'.format(name)
-        return self.api_request(url=url)
-    
-    def web_search(self, name: str) -> dict:
-        post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": 1, "count": 30}
+    def sides_search(self, name: str, page: int=1, count: int=30) -> dict:
+        post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": page, "count": count}
         url = 'Search/Sides'
 
         return self.api_request(url=url, **post_data)
 
-    def accounting_stat(self, inn: str, year_from: int=0, year_to: int=0) -> dict:
+    def get_accounting_stat(self, inn: str, year_from: int=0, year_to: int=0) -> dict:
         url = 'Card/AccountingStat'
         # {"inn":"5433178674","yearFrom":2009,"yearTo":2009}
         post_data = {"inn": inn}
@@ -81,20 +77,26 @@ class CasebookAPI(ApiMethods):
 
         return self.api_request(url=url, **post_data)
 
-    def get_egrul_link(self):
+    def get_egrul_link(self, **kwargs):
+
+        slots = ['Inn', 'Name', 'ShortName', 'Address', 'Ogrn', 'Okpo', 'IsUnique',
+                 'IsBranch', 'OrganizationId', 'OrganizationDictId', 'StorageId',
+                 'IsNotPrecise', 'HeadFio', 'StatusId']
+
         url = 'Card/Excerpt?'
-        # Inn:7743507562
-        # Name:АВТОНОМНАЯ НЕКОММЕРЧЕСКАЯ ОРГАНИЗАЦИЯ "ФОНД РАЗВИТИЯ ПАРАЛИМПИЙСКОГО ДВИЖЕНИЯ РОССИИ, СПЕЦНАЗА, МВД, ФСБ И МО РФ"
-        # ShortName:АНО "ФОНД РАЗВИТИЯ ПАРАЛИМПИЙСКОГО ДВИЖЕНИЯ РОССИИ, СПЕЦНАЗА, МВД, ФСБ И МО РФ"
-        # Address:125502, ГОРОД МОСКВА, УЛИЦА ПЕТРОЗАВОДСКАЯ, Д. 11 / 3
-        # Ogrn:1037739863810
-        # Okpo:70089674
-        # IsUnique:false
-        # IsBranch:false
-        # OrganizationId:0
-        # OrganizationDictId:
-        # StorageId:5858553
-        # IsNotPrecise:
-        # HeadFio:
-        # StatusId:0
-        # useCache:true
+
+        for slot in slots:
+            url += '{}={}&'.format(slot, kwargs[slot] if kwargs.get(slot) else '')
+
+        url += 'useCache=True'
+
+        return self.base_url + url
+
+    def get_buisnes_card(self, **kwargs):
+
+        slots = ['Name', 'Address', 'Ogrn', 'IsUnique', 'IsPhysical', 'Okpo', 'OrganizationId']
+        url = 'Card/BusinessCard'
+
+        post_data = {key: kwargs.get(key) for key in slots}
+
+        return self.api_request(url=url, **post_data)
