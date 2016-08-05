@@ -61,7 +61,7 @@ class CasebookAPI(ApiMethods):
         return response.get('Success') if response.get('Success') else response.get('Message') if response.get('Message') else response.get('error')
 
     def sides_search(self, name: str, page: int = 1, count: int = 30) -> dict:
-        post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": page, "count": count}
+        post_data = {"Filters": [{'Mode': "Contains", "Type": "Name", "Value": name}], "Page": page, "Count": count}
         url = 'Search/Sides'
 
         return self.api_request(url=url, **post_data)
@@ -72,8 +72,8 @@ class CasebookAPI(ApiMethods):
         post_data = {"inn": inn}
 
         if year_from:
-            post_data['yearFrom'] = year_from
-            post_data['yearTo'] = year_to if year_to else year_from
+            post_data['YearFrom'] = year_from
+            post_data['YearTo'] = year_to if year_to else year_from
 
         return self.api_request(url=url, **post_data)
 
@@ -88,7 +88,7 @@ class CasebookAPI(ApiMethods):
         for slot in slots:
             url += '{}={}&'.format(slot, kwargs[slot] if kwargs.get(slot) else '')
 
-        url += 'useCache=True'
+        url += 'UseCache=True'
 
         return self.base_url + url
 
@@ -109,7 +109,7 @@ class CasebookAPI(ApiMethods):
 
     def get_state_contracts(self, inn: str, page: str = '1', perpage: str = '30', datefrom: str = '2016-01-01', dateto: str = '2016-12-31'):
         url = 'Card/StateContracts{}'
-        query_data = '?page={}&perpage={}&supplier={}&datefrom={}&dateto={}'.format(page, perpage, inn, datefrom, dateto)
+        query_data = '?Page={}&Perpage={}&Supplier={}&Datefrom={}&Dateto={}'.format(page, perpage, inn, datefrom, dateto)
 
         return self.api_request(url=url.format(query_data))
 
