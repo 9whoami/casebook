@@ -34,7 +34,7 @@ class ApiMethods(Grab):
         config = Conf(section='api')
         self.base_url = config.main_url
 
-        super().__init__(timeout=60)
+        super().__init__(timeout=60, connect_timeout=15)
 
     def api_request(self, url: str = '', origin: 'json=1 or body=0' = 1, **kwargs: 'post data dict') -> dict:
         try:
@@ -58,7 +58,7 @@ class CasebookAPI(ApiMethods):
         }
 
         response = self.api_request(url=url, **post_data)
-        return bool(response.get('Success'))
+        return response.get('Success') if response.get('Success') else response.get('Message') if response.get('Message') else response.get('error')
 
     def sides_search(self, name: str, page: int = 1, count: int = 30) -> dict:
         post_data = {"filters": [{'mode': "Contains", "type": "Name", "value": name}], "page": page, "count": count}
@@ -103,7 +103,7 @@ class CasebookAPI(ApiMethods):
 
     def get_license(self, inn: str, ogrn: str, page: int = 1, count: int = 30):
         url = 'Card/Licenses'
-        post_data = {"page": page, "count": count, "inn": inn, "ogrn": ogrn}
+        post_data = {"Page": page, "Count": count, "Inn": inn, "Ogrn": ogrn}
 
         return self.api_request(url=url, **post_data)
 
@@ -115,7 +115,7 @@ class CasebookAPI(ApiMethods):
 
     def get_audit(self, inn: str, year: int = 2016, page: int = 1):
         url = 'https://casebook.ru/api/Card/GetAuditPlans'
-        post_data = {"inn": inn, "year": year, "page": page}
+        post_data = {"Inn": inn, "Year": year, "Page": page}
 
         return self.api_request(url=url, **post_data)
 
@@ -124,35 +124,35 @@ class CasebookAPI(ApiMethods):
         return self.api_request(url=url)
 
     def get_executory_processes_statistics(self, page: int = 1, count: int = 30, **kwargs):
-        slots = ['inn', 'name', 'shortName', 'address', 'ogrn', 'okpo',
-                 'isUnique', 'isBranch', 'organizationDictId', 'storageId',
-                 'statusId', 'organizationName', 'organizationInn', 'executoryObjectIds',
-                 'executoryProcessStatus', 'minSum', 'maxSum', 'dateFrom', 'dateTo',
-                 'fieldOrder', 'typeOrder']
+        slots = ['Inn', 'Name', 'ShortName', 'Address', 'Ogrn', 'Okpo',
+                 'IsUnique', 'IsBranch', 'OrganizationDictId', 'StorageId',
+                 'StatusId', 'OrganizationName', 'OrganizationInn', 'ExecutoryObjectIds',
+                 'ExecutoryProcessStatus', 'MinSum', 'MaxSum', 'DateFrom', 'DateTo',
+                 'FieldOrder', 'TypeOrder']
 
-        def_params = {'minSum': 0, 'maxSum': -1, 'dateFrom': None, 'dateTo': None, 'fieldOrder': 0,
-                      'typeOrder': 1, 'executoryObjectIds': None, 'organizationInn': kwargs.get('inn'),
-                      'organizationName': kwargs.get('name'), 'executoryProcessStatus': -1}
+        def_params = {'MinSum': 0, 'MaxSum': -1, 'DateFrom': None, 'DateTo': None, 'FieldOrder': 0,
+                      'TypeOrder': 1, 'ExecutoryObjectIds': None, 'OrganizationInn': kwargs.get('Inn'),
+                      'OrganizationName': kwargs.get('Name'), 'ExecutoryProcessStatus': -1}
 
         url = 'Card/ExecutoryProcessesStatistics'
         post_data = {key: def_params[key] if def_params.get(key) else kwargs.get(key) for key in slots}
-        post_data['page'] = page
-        post_data['count'] = count
+        post_data['Page'] = page
+        post_data['Count'] = count
         return self.api_request(url=url, **post_data)
 
     def get_executory_processes(self, page: int = 1, count: int = 30, **kwargs):
-        slots = ['inn', 'name', 'shortName', 'address', 'ogrn', 'okpo',
-                 'isUnique', 'isBranch', 'organizationDictId', 'storageId',
-                 'statusId', 'organizationName', 'organizationInn', 'executoryObjectIds',
-                 'executoryProcessStatus', 'minSum', 'maxSum', 'dateFrom', 'dateTo',
-                 'fieldOrder', 'typeOrder']
+        slots = ['Inn', 'Name', 'ShortName', 'Address', 'Ogrn', 'Okpo',
+                 'IsUnique', 'IsBranch', 'OrganizationDictId', 'StorageId',
+                 'StatusId', 'OrganizationName', 'OrganizationInn', 'ExecutoryObjectIds',
+                 'ExecutoryProcessStatus', 'MinSum', 'MaxSum', 'DateFrom', 'DateTo',
+                 'FieldOrder', 'TypeOrder']
 
-        def_params = {'minSum': 0, 'maxSum': -1, 'dateFrom': None, 'dateTo': None, 'fieldOrder': 0,
-                      'typeOrder': 1, 'executoryObjectIds': None, 'organizationInn': kwargs.get('inn'),
-                      'organizationName': kwargs.get('name'), 'executoryProcessStatus': -1}
+        def_params = {'MinSum': 0, 'MaxSum': -1, 'DateFrom': None, 'DateTo': None, 'FieldOrder': 0,
+                      'TypeOrder': 1, 'ExecutoryObjectIds': None, 'OrganizationInn': kwargs.get('Inn'),
+                      'OrganizationName': kwargs.get('Name'), 'ExecutoryProcessStatus': -1}
 
         url = 'Card/ExecutoryProcesses'
         post_data = {key: def_params[key] if def_params.get(key) else kwargs.get(key) for key in slots}
-        post_data['page'] = page
-        post_data['count'] = count
+        post_data['Page'] = page
+        post_data['Count'] = count
         return self.api_request(url=url, **post_data)
