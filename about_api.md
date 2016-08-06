@@ -5,7 +5,7 @@
     POST
 #### Request Pyaload: 
 
-<pre><code>
+```
 
     {
         'UserName': email_adress,
@@ -14,11 +14,11 @@
         'SystemName': 'sps'
     }
     
-</pre></code>
+```
 
 #### Response:
 
-<pre><code>
+```
     {
         'Message': 'Активируйте аккаунт по ссылке в письме.', 
         'Timings': None, 
@@ -26,7 +26,7 @@
         'Success': False, 
         'ServerDate': '2016-08-05T01:02:17.0007294+03:00'
     }
-</pre></code>
+```
 
 * Message - *(str)* Сообщение сервера, например сообщение об ошибке как в данном примере
 * Timings - *(unknown)* Время ответа сервера
@@ -82,13 +82,13 @@
     POST
 #### Request Pyaload: 
 
-<pre><code>
+```
     {
         "inn":"5433178674",
         "yearFrom":2009,
         "yearTo":2009
     }
-</pre></code>
+```
 
 > Параметры yearFrom и yearTo необязательны
 
@@ -108,7 +108,7 @@
     GET
 #### Query String Parameters:
 
-<pre><code>
+```
     Inn=5433178674
     Name=ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ ПРОФИЛЬНАЯ ИННОВАЦИОННАЯ КОМПАНИЯ "ХАРТИЯ БЕЗОПАСНОСТИ"
     ShortName=ООО ПИК "ХАРТИЯ БЕЗОПАСНОСТИ"
@@ -123,7 +123,7 @@
     HeadFio=ЛЬВУТИН ПАВЕЛ ЭДУАРДОВИЧ
     StatusId= 
     useCache=True
-</pre></code>
+```
 
 * useCache - всегда True. Все остальное берется из инфы о компании. 
 
@@ -136,7 +136,7 @@
     POST
 #### Request Pyaload: 
 
-<pre><code>
+```
     {
         'IsUnique': None, 
         'IsPhysical': False, 
@@ -146,7 +146,7 @@
         'Ogrn': '1095475003821', 
         'Address': '630559, НОВОСИБИРСКАЯ ОБЛАСТЬ, РАБОЧИЙ ПОСЕЛОК КОЛЬЦОВО, УЛИЦА ТЕХНОПАРКОВАЯ, Д. 1'
     }
-</pre></code>
+```
 
 #### Response:
 * Success - *(bool)* Результат запроса
@@ -159,14 +159,14 @@
 #### Request Method:
     POST
 #### RequestPayload: 
-<pre><code>
+```
     {
         "page":1,
         "count":30,
         "inn":"3445102073",
         "ogrn":"1093460001095"
     }
-</pre></code>
+```
 
 > page - Страница
 > count - Количетво результатов на страницу
@@ -188,13 +188,13 @@
     GET
 #### Query String Parameters:
 
-<pre><code>
+```
     page=1
     perpage=30
     supplier=3445102073
     datefrom=2016-01-01
     dateto=2016-12-31
-</pre></code>
+```
 
 * page - страница
 * perpage - количество элементов на страницу
@@ -214,13 +214,13 @@
     POST
 #### Request Payload:
 
-<pre><code>
+```
     {
         "inn":"3445102073",
         "year":2016,
         "page":1
     }
-</pre></code>
+```
     
 #### Response:
 * success - *(bool)* Результат выполнения запроса
@@ -235,7 +235,7 @@
     GET
 #### Response:
 
-<pre><code>
+```
     {
       "message": null,
       "serverDate": "2016-08-04T22:58:39.0005428+03:00",
@@ -246,7 +246,7 @@
       "success": true,
       "timings": null
     }
-</pre></code>
+```
     
 # Статистика исполнительных производств
 #### Request URL:
@@ -255,7 +255,7 @@
     POST
 #### Request Payload:
 
-<pre><code>
+```
     {
     "inn":"3445102073",
     "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
@@ -281,11 +281,11 @@
     "fieldOrder":0,
     "typeOrder":1
     }
-</pre></code>
+```
     
 #### Response:
 
-<pre><code>
+```
 {
   "message": null,
   "serverDate": "2016-08-04T23:12:30.0000262+03:00",
@@ -300,7 +300,7 @@
   "success": true,
   "timings": null
 }
-</pre></code>
+```
 
 # Исполнительные производства
 #### Request URL:
@@ -309,7 +309,7 @@
     POST
 #### Request Payload:
 
-<pre><code>
+```
     {
     "inn":"3445102073",
     "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
@@ -335,7 +335,7 @@
     "fieldOrder":0,
     "typeOrder":1
     }
-</pre></code>
+```
     
 * page - страница
 * count - результатов на страницу
@@ -356,7 +356,7 @@
     POST
 #### Request Payload:
 
-<pre><code>
+```
 {
     'accuracy': 0,
     'bankruptStages': None,
@@ -429,14 +429,14 @@
     'stateOrganizations': None,
     'statusEx': None,
 }
-</pre></code>
+```
 
 * dateFrom - дата регистрации компании (RegistrationDate)
 * dateTo - дата ликвидации ?
 
 #### Response:
 
-<pre><code>
+```
 {
   "message": "",
   "serverDate": "2016-08-06T12:22:30.0000153+03:00",
@@ -646,7 +646,7 @@
     "GetCasesList.SortAndMerge 00:00:00"
   ]
 }
-</pre></code>
+```
 
 # Краткая статистика арбитражных дел
 #### Request URL: 
@@ -655,7 +655,7 @@
     POST
 #### Request Payload:
 
-<pre><code>
+```
 {
     "statusEx":null,
     "sideTypes":null,
@@ -724,11 +724,11 @@
     "executionsDateTo":null,
     "generalCourts":null
 }
-</pre></code>
+```
 
 #### Response:
 
-<pre><code>
+```
 {
   "message": null,
   "serverDate": "2016-08-06T09:08:27.0002762+03:00",
@@ -752,7 +752,7 @@
     "jsonCamelCase 00:00:00"
   ]
 }
-</pre></code>
+```
 
 * casesAny - *(int)* количесво арбитражных дел
 * plaintiff - *(int)* в качестве исца
@@ -767,7 +767,7 @@
     POST
 #### Request Payload:
 
-<pre><code>
+```
 {
     "statusEx":null,
     "sideTypes":null,
@@ -837,11 +837,11 @@
     "executionsDateTo":null,
     "generalCourts":null
 }
-</pre></code>
+```
 
 #### Response:
 
-<pre><code>
+```
 {
   "message": null,
   "serverDate": "2016-08-06T09:38:44.0001942+03:00",
@@ -867,7 +867,7 @@
     "jsonCamelCase 00:00:00"
   ]
 }
-</pre></code>
+```
 
 * plaintiff - *(int)* в качестве исца
 * respondent - *(int)* в качестве ответчика
