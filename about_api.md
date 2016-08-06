@@ -274,3 +274,292 @@ Response:
     [message] - (str) Сообщение сервера
     [result][pagesCount] - (int) Количесво страниц
     [result][executoryProcesses] - (list) Список производств
+    
+    
+Список арбитражных дел
+Request URL:https://casebook.ru/api/Search/Cases
+Request Method:POST
+Request Payload:
+{
+    accuracy:0
+    bankruptStages:null
+    caseCategoryId:null
+    caseResults:null
+    caseTypes:null
+    coSides:[]
+    considerType:-1
+    count:30
+    courtType:-1
+    courts:null
+    dateFrom:"2009-03-05"
+    dateTo:null
+    delegate:""
+    executionObject:null
+    executionStatus:-1
+    executionsDateFrom:null
+    executionsDateTo:null
+    finalDocFrom:null
+    finalDocTo:null
+    generalCaseTypes:null
+    generalCourts:null
+    instances:null
+    isCasesTracking:true
+    isMessageFrTracking:true
+    isNeedAccuracy:2
+    isNeedFnsChanges:true
+    isNeedMAClaims:true
+    isNeedNewCasesTracking:true
+    isNeedWritsTracking:false
+    judges:null
+    maxExecutionSum:-1
+    maxSum:-1
+    minExecutionSum:0
+    minSum:0
+    monitoredStatus:-1
+    orderBy:"incoming_date_ts desc, case_number desc"
+    page:1
+    sessionFrom:null
+    sessionTo:null
+    side:null
+    sideTypes:null
+    sides:[
+        0:{
+            address:"400066, ВОЛГОГРАДСКАЯ обл, ВОЛГОГРАД г, ИМ СКОСЫРЕВА ул, д.7"
+            inn:"3445102073"
+            isBranch:false
+            isOriginal:true
+            name:"ООО "ЛУКОЙЛ-Теплотранспортная компания""
+            ogrn:"1093460001095"
+            okpo:""
+            shortName:"ООО "ЛУКОЙЛ-Теплотранспортная компания""
+            statusId:null
+            statusName:null
+        }
+        1:{
+            address:"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7"
+            inn:"3445102073"
+            isBranch:false
+            isUnique:false
+            name:"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ""
+            ogrn:"1093460001095"
+            okpo:"60915315"
+            organizationDictId:null
+            shortName:"ООО "ЛУКОЙЛ-ТТК""
+            statusId:null
+            storageId:4477117
+        }
+    ]
+    stateOrganizations:null
+    statusEx:null
+}
+Response:
+
+
+Краткая статистика арбитражных дел
+Request URL:https://casebook.ru/api/Card/OrgStatShort
+Request Method:POST
+Request Payload:
+{
+    "statusEx":null,
+    "sideTypes":null,
+    "monitoredStatus":-1,
+    "considerType":-1,
+    "courtType":-1,
+    "caseResults":null,
+    "caseTypes":null,
+    "caseCategoryId":null,
+    "bankruptStages":null,
+    "courts":null,
+    "instances":null,
+    "judges":null,
+    "delegate":"",
+    "stateOrganizations":null,
+    "isNeedFnsChanges":true,
+    "isNeedMAClaims":true,
+    "isNeedAccuracy":2,
+    "isNeedWritsTracking":false,
+    "isNeedNewCasesTracking":true,
+    "isMessageFrTracking":true,
+    "isCasesTracking":true,
+    "dateFrom":"2009-03-05",
+    "dateTo":null,
+    "sessionFrom":null,
+    "sessionTo":null,
+    "finalDocFrom":null,
+    "finalDocTo":null,
+    "minSum":0,
+    "maxSum":-1,
+    "sides":[
+        {
+            "name":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"",
+            "shortName":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"",
+            "inn":"3445102073",
+            "ogrn":"1093460001095",
+            "okpo":"",
+            "address":"400066, ВОЛГОГРАДСКАЯ обл, ВОЛГОГРАД г, ИМ СКОСЫРЕВА ул, д.7",
+            "statusId":null,
+            "statusName":null,
+            "isBranch":false,
+            "isOriginal":true
+        },
+        {
+            "inn":"3445102073",
+            "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"","shortName":"ООО \"ЛУКОЙЛ-ТТК\"",
+            "address":"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+            "ogrn":"1093460001095",
+            "okpo":"60915315",
+            "isUnique":false,
+            "isBranch":false,
+            "organizationDictId":null,
+            "storageId":4477117,
+            "statusId":null
+        }
+    ],
+    "coSides":[],
+    "accuracy":0,
+    "generalCaseTypes":null,
+    "side":null,
+    "executionObject":null,
+    "executionStatus":-1,
+    "minExecutionSum":0,
+    "maxExecutionSum":-1,
+    "executionsDateFrom":null,
+    "executionsDateTo":null,
+    "generalCourts":null
+}
+
+Response:
+{
+  "message": null,
+  "serverDate": "2016-08-06T09:08:27.0002762+03:00",
+  "result": {
+    "counts": {
+      "casesAny": 5172,
+      "plaintiff": 4537,
+      "respondent": 312,
+      "third": 457
+    },
+    "sums": {
+      "casesAny": 5848898563.829999,
+      "plaintiff": 6285478904.4599991,
+      "respondent": 436580340.63000005,
+      "third": 338465131.16
+    },
+    "sumsKey": null
+  },
+  "success": true,
+  "timings": [
+    "jsonCamelCase 00:00:00"
+  ]
+}
+casesAny - количесво арбитражных дел
+plaintiff - в качестве исца
+respondent - в качестве ответчика
+third - в качестве третьего лица
+sums - исковые требования
+
+Статистика арбитражных дел
+Request URL:https://casebook.ru/api/Card/OrgStatBySideTypes
+Request Method:POST
+Request Payload:
+{
+    "statusEx":null,
+    "sideTypes":null,
+    "monitoredStatus":-1,
+    "considerType":-1,
+    "courtType":-1,
+    "caseResults":null,
+    "caseTypes":null,
+    "caseCategoryId":null,
+    "bankruptStages":null,
+    "courts":null,
+    "instances":null,
+    "judges":null,
+    "delegate":"",
+    "stateOrganizations":null,
+    "isNeedFnsChanges":true,
+    "isNeedMAClaims":true,
+    "isNeedAccuracy":2,
+    "isNeedWritsTracking":false,
+    "isNeedNewCasesTracking":true,
+    "isMessageFrTracking":true,
+    "isCasesTracking":true,
+    "dateFrom":"2015-08-06",
+    "dateTo":"2016-08-06",
+    "sessionFrom":null,
+    "sessionTo":null,
+    "finalDocFrom":null,
+    "finalDocTo":null,
+    "minSum":0,
+    "maxSum":-1,
+    "sides":[
+        {
+            "name":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"","shortName":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"",
+            "inn":"3445102073",
+            "ogrn":"1093460001095",
+            "okpo":"",
+            "address":"400066, ВОЛГОГРАДСКАЯ обл, ВОЛГОГРАД г, ИМ СКОСЫРЕВА ул, д.7",
+            "statusId":null,
+            "statusName":null,
+            "isBranch":false,
+            "isOriginal":true
+        },
+        {
+            "inn":"3445102073",
+            "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"","shortName":"ООО \"ЛУКОЙЛ-ТТК\"",
+            "address":"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+            "ogrn":"1093460001095",
+            "okpo":"60915315",
+            "isUnique":false,
+            "isBranch":false,
+            "organizationDictId":null,
+            "storageId":4477117,
+            "statusId":null
+        }
+    ],
+    "coSides":[],
+    "accuracy":0,
+    "page":1,
+    "count":30,
+    "generalCaseTypes":null,
+    "side":null,
+    "executionObject":null,
+    "executionStatus":-1,
+    "minExecutionSum":0,
+    "maxExecutionSum":-1,
+    "executionsDateFrom":null,
+    "executionsDateTo":null,
+    "generalCourts":null
+}
+Response:
+{
+  "message": null,
+  "serverDate": "2016-08-06T09:38:44.0001942+03:00",
+  "result": {
+    "counts": {
+      "plaintiff": 1464,
+      "respondent": 59,
+      "third": 158,
+      "other": 17,
+      "casesAny": 1685
+    },
+    "sums": {
+      "plaintiff": 2471010788.57,
+      "respondent": 97253007.219999984,
+      "third": 33892329.84,
+      "other": 4315210.26,
+      "casesAny": 0.0
+    },
+    "sumsKey": null
+  },
+  "success": true,
+  "timings": [
+    "jsonCamelCase 00:00:00"
+  ]
+}
+plaintiff - в качестве исца
+respondent - в качестве ответчика
+third - в качестве третьего лица
+casesAny - в качестве иного лица
+counts - количесво дел
+sums - исковые требования

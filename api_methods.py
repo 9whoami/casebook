@@ -42,7 +42,7 @@ class ApiMethods(Grab):
             self.go(url, post=kwargs)
             response = self.response.json if origin else self.response.body
         except Exception as e:
-            response = dict(error=e)
+            response = dict(Message=e)
 
         return response
 
@@ -58,7 +58,7 @@ class CasebookAPI(ApiMethods):
         }
 
         response = self.api_request(url=url, **post_data)
-        return response.get('Success') if response.get('Success') else response.get('Message') if response.get('Message') else response.get('error')
+        return response.get('Success') if response.get('Success') else response.get('Message')
 
     def sides_search(self, name: str, page: int = 1, count: int = 30) -> dict:
         post_data = {"Filters": [{'Mode': "Contains", "Type": "Name", "Value": name}], "Page": page, "Count": count}
