@@ -1,19 +1,23 @@
-#Вход
-####Request Url: 
+# Вход
+#### Request Url: 
     https://casebook.ru/api/Account/LogOn
-####Request method: 
+#### Request method: 
     POST
-####Request Pyaload:
-`    
+#### Request Pyaload: 
+
+<pre><code>
+
     {
         'UserName': email_adress,
         'Password': password,
         'RememberMe': True,
         'SystemName': 'sps'
     }
-`
+</pre></code>
 
-####Response:
+#### Response:
+
+<pre><code>
     {
         'Message': 'Активируйте аккаунт по ссылке в письме.', 
         'Timings': None, 
@@ -21,19 +25,22 @@
         'Success': False, 
         'ServerDate': '2016-08-05T01:02:17.0007294+03:00'
     }
-    
-*[Message] - *(str)* Сообщение сервера, например сообщение об ошибке как в данном примере
-*[Timings] - *(unknown)* Время ответа сервера
-*[Result] - *(unknown)* ?
-*[Success] - *(bool)* Результат. В данном случае входи не удался.
-*[ServerDate] - *(unknown)* Время сервера
+</pre></code>
 
-=(equal sign)
+* Message - *(str)* Сообщение сервера, например сообщение об ошибке как в данном примере
+* Timings - *(unknown)* Время ответа сервера
+* Result - *(unknown)* ?
+* Success - *(bool)* Результат. В данном случае входи не удался.
+* ServerDate - *(unknown)* Время сервера
 
-Поиск компаний
-Request Url: https://casebook.ru/api/Search/Sides
-Request method: POST
-Request Pyaload:
+# Поиск компаний
+#### Request Url: 
+    https://casebook.ru/api/Search/Sides
+#### Request method: 
+    POST
+#### Request Pyaload:
+
+<pre><code>    
     {
         "filters": [
             {
@@ -45,47 +52,62 @@ Request Pyaload:
         "page": 1, 
         "count": 30
     }
+</pre></code>
 
-filtres - фильтры поиска.
-    mode - ?
-    type - Тип поиска. Возможен поиск по хэшу.
-    value - поисковая строка
-page - страница
-count - количесво элементов на странице
++ filtres - фильтры поиска.
+    * mode - ?
+    * type - Тип поиска. Возможен поиск по хэшу.
+    * value - поисковая строка
+- page - страница
+* count - количесво элементов на странице
 
-Response:
-В ответ получим json со списком компаний. Основные ключи опписаны ниже.
-[Result][Items] - (list) Список компаний
-[Success] - (bool) Результат запроса
-[Message] - (str) Сообщение сервера
-[Result][Page] - (int) Текущая страница
-[Result][PageSize] - (int) Количество элементов
-[Result][PageCount] - (int) Количество страниц
-[Result][TotalCount] - (int) Общее количесво найденых компаний
+#### Response:
 
-Бухгалтерская отчетность
-Request Url: https://casebook.ru/api/Card/AccountingStat
-Request method: POST
-Request Pyaload:
+> В ответ получим json со списком компаний. Основные ключи опписаны ниже.
+
+* Result.Items - *(list)* Список компаний
+* Success - *(bool)* Результат запроса
+* Message - *(str)* Сообщение сервера
++ Result - *(dict)* Резултат поиска
+    * Page - *(int)* Текущая страница
+    * PageSize - *(int)* Количество элементов
+    * PageCount - *(int)* Количество страниц
+    * TotalCount - *(int)* Общее количесво найденых компаний
+
+# Бухгалтерская отчетность
+#### Request Url: 
+    https://casebook.ru/api/Card/AccountingStat
+#### Request method: 
+    POST
+#### Request Pyaload: 
+
+<pre><code>
     {
         "inn":"5433178674",
         "yearFrom":2009,
         "yearTo":2009
     }
+</pre></code>
 
-    Параметры yearFrom и yearTo необязательны
+> Параметры yearFrom и yearTo необязательны
 
-Response:
-[Message] - (str) Сообщение сервера
-[Success] - (bool) Результат запроса
-[Result][AvailableDateTimeRanges] - (dict) Список доступных временных интервалов
-[Result][GroupReports] - (list) ?
-[Result][NotCompareReports] - (list) ?
+#### Response:
 
-Получение ссылки на ЕГРЮЛ
-Request Url: https://casebook.ru/api/Card/Excerpt?Inn=5433178674&Name=%D0%9E%D0%91%D0%A9%D0%95%D0%A1%D0%A2%D0%92%D0%9E%20%D0%A1%20%D0%9E%D0%93%D0%A0%D0%90%D0%9D%D0%98%D0%A7%D0%95%D0%9D%D0%9D%D0%9E%D0%99%20%D0%9E%D0%A2%D0%92%D0%95%D0%A2%D0%A1%D0%A2%D0%92%D0%95%D0%9D%D0%9D%D0%9E%D0%A1%D0%A2%D0%AC%D0%AE%20%D0%9F%D0%A0%D0%9E%D0%A4%D0%98%D0%9B%D0%AC%D0%9D%D0%90%D0%AF%20%D0%98%D0%9D%D0%9D%D0%9E%D0%92%D0%90%D0%A6%D0%98%D0%9E%D0%9D%D0%9D%D0%90%D0%AF%20%D0%9A%D0%9E%D0%9C%D0%9F%D0%90%D0%9D%D0%98%D0%AF%20%22%D0%A5%D0%90%D0%A0%D0%A2%D0%98%D0%AF%20%D0%91%D0%95%D0%97%D0%9E%D0%9F%D0%90%D0%A1%D0%9D%D0%9E%D0%A1%D0%A2%D0%98%22&ShortName=%D0%9E%D0%9E%D0%9E%20%D0%9F%D0%98%D0%9A%20%22%D0%A5%D0%90%D0%A0%D0%A2%D0%98%D0%AF%20%D0%91%D0%95%D0%97%D0%9E%D0%9F%D0%90%D0%A1%D0%9D%D0%9E%D0%A1%D0%A2%D0%98%22&Address=630559,%20%D0%9D%D0%9E%D0%92%D0%9E%D0%A1%D0%98%D0%91%D0%98%D0%A0%D0%A1%D0%9A%D0%90%D0%AF%20%D0%9E%D0%91%D0%9B%D0%90%D0%A1%D0%A2%D0%AC,%20%D0%A0%D0%90%D0%91%D0%9E%D0%A7%D0%98%D0%99%20%D0%9F%D0%9E%D0%A1%D0%95%D0%9B%D0%9E%D0%9A%20%D0%9A%D0%9E%D0%9B%D0%AC%D0%A6%D0%9E%D0%92%D0%9E,%20%D0%A3%D0%9B%D0%98%D0%A6%D0%90%20%D0%A2%D0%95%D0%A5%D0%9D%D0%9E%D0%9F%D0%90%D0%A0%D0%9A%D0%9E%D0%92%D0%90%D0%AF,%20%D0%94.%201&Ogrn=1095475003821&Okpo=62883530&IsUnique=&IsBranch=&OrganizationId=&OrganizationDictId=&StorageId=6923889&IsNotPrecise=&HeadFio=%D0%9B%D0%AC%D0%92%D0%A3%D0%A2%D0%98%D0%9D%20%D0%9F%D0%90%D0%92%D0%95%D0%9B%20%D0%AD%D0%94%D0%A3%D0%90%D0%A0%D0%94%D0%9E%D0%92%D0%98%D0%A7&StatusId=&useCache=True
-Request method: GET
-Query String Parameters:
+* Message - *(str)* Сообщение сервера
+* Success - *(bool)* Результат запроса
++ Result:
+    * AvailableDateTimeRanges - *(dict)* Список доступных временных интервалов
+    * GroupReports - *(list)* ?
+    * NotCompareReports - *(list)* ?
+
+# Формирование ссылки на ЕГРЮЛ
+#### Request Url: 
+    https://casebook.ru/api/Card/Excerpt?Inn=5433178674&Name=%D0%9E%D0%91%D0%A9%D0%95%D0%A1%D0%A2%D0%92%D0%9E%20%D0%A1%20%D0%9E%D0%93%D0%A0%D0%90%D0%9D%D0%98%D0%A7%D0%95%D0%9D%D0%9D%D0%9E%D0%99%20%D0%9E%D0%A2%D0%92%D0%95%D0%A2%D0%A1%D0%A2%D0%92%D0%95%D0%9D%D0%9D%D0%9E%D0%A1%D0%A2%D0%AC%D0%AE%20%D0%9F%D0%A0%D0%9E%D0%A4%D0%98%D0%9B%D0%AC%D0%9D%D0%90%D0%AF%20%D0%98%D0%9D%D0%9D%D0%9E%D0%92%D0%90%D0%A6%D0%98%D0%9E%D0%9D%D0%9D%D0%90%D0%AF%20%D0%9A%D0%9E%D0%9C%D0%9F%D0%90%D0%9D%D0%98%D0%AF%20%22%D0%A5%D0%90%D0%A0%D0%A2%D0%98%D0%AF%20%D0%91%D0%95%D0%97%D0%9E%D0%9F%D0%90%D0%A1%D0%9D%D0%9E%D0%A1%D0%A2%D0%98%22&ShortName=%D0%9E%D0%9E%D0%9E%20%D0%9F%D0%98%D0%9A%20%22%D0%A5%D0%90%D0%A0%D0%A2%D0%98%D0%AF%20%D0%91%D0%95%D0%97%D0%9E%D0%9F%D0%90%D0%A1%D0%9D%D0%9E%D0%A1%D0%A2%D0%98%22&Address=630559,%20%D0%9D%D0%9E%D0%92%D0%9E%D0%A1%D0%98%D0%91%D0%98%D0%A0%D0%A1%D0%9A%D0%90%D0%AF%20%D0%9E%D0%91%D0%9B%D0%90%D0%A1%D0%A2%D0%AC,%20%D0%A0%D0%90%D0%91%D0%9E%D0%A7%D0%98%D0%99%20%D0%9F%D0%9E%D0%A1%D0%95%D0%9B%D0%9E%D0%9A%20%D0%9A%D0%9E%D0%9B%D0%AC%D0%A6%D0%9E%D0%92%D0%9E,%20%D0%A3%D0%9B%D0%98%D0%A6%D0%90%20%D0%A2%D0%95%D0%A5%D0%9D%D0%9E%D0%9F%D0%90%D0%A0%D0%9A%D0%9E%D0%92%D0%90%D0%AF,%20%D0%94.%201&Ogrn=1095475003821&Okpo=62883530&IsUnique=&IsBranch=&OrganizationId=&OrganizationDictId=&StorageId=6923889&IsNotPrecise=&HeadFio=%D0%9B%D0%AC%D0%92%D0%A3%D0%A2%D0%98%D0%9D%20%D0%9F%D0%90%D0%92%D0%95%D0%9B%20%D0%AD%D0%94%D0%A3%D0%90%D0%A0%D0%94%D0%9E%D0%92%D0%98%D0%A7&StatusId=&useCache=True
+#### Request method: 
+    GET
+#### Query String Parameters:
+
+<pre><code>
     Inn=5433178674
     Name=ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ ПРОФИЛЬНАЯ ИННОВАЦИОННАЯ КОМПАНИЯ "ХАРТИЯ БЕЗОПАСНОСТИ"
     ShortName=ООО ПИК "ХАРТИЯ БЕЗОПАСНОСТИ"
@@ -100,14 +122,20 @@ Query String Parameters:
     HeadFio=ЛЬВУТИН ПАВЕЛ ЭДУАРДОВИЧ
     StatusId= 
     useCache=True
-    
-useCache - всегда True. Все остальное берется из инфы о компании. 
-Все ключи обязательны, даже если они пустые
+</pre></code>
 
-Общая информация о компании
-Request Url: https://casebook.ru/api/Card/BusinessCard
-Request method: POST
-Request Pyaload:
+* useCache - всегда True. Все остальное берется из инфы о компании. 
+
+> Все ключи обязательны, даже если они пустые
+
+# Общая информация о компании
+#### Request Url: 
+    https://casebook.ru/api/Card/BusinessCard
+#### Request method: 
+    POST
+#### Request Pyaload: 
+
+<pre><code>
     {
         'IsUnique': None, 
         'IsPhysical': False, 
@@ -117,75 +145,96 @@ Request Pyaload:
         'Ogrn': '1095475003821', 
         'Address': '630559, НОВОСИБИРСКАЯ ОБЛАСТЬ, РАБОЧИЙ ПОСЕЛОК КОЛЬЦОВО, УЛИЦА ТЕХНОПАРКОВАЯ, Д. 1'
     }
-    
-Response:
-[Success] - (bool) Результат запроса
-[Message] - (str) Сообщение сервера
-[Result] - (dict) Общая информация о компании
+</pre></code>
 
-Лицензии
-Request URL:https://casebook.ru/api/Card/Licenses
-Request Method:POST
-RequestPayload: 
+#### Response:
+* Success - *(bool)* Результат запроса
+* Message - *(str)* Сообщение сервера
+* Result - *(dict)* Общая информация о компании
+
+# Лицензии
+#### Request URL:
+    https://casebook.ru/api/Card/Licenses
+#### Request Method:
+    POST
+#### RequestPayload: 
+<pre><code>
     {
         "page":1,
         "count":30,
         "inn":"3445102073",
         "ogrn":"1093460001095"
     }
+</pre></code>
 
-page - Страница
-count - Количетво результатов на страницу
+> page - Страница
+> count - Количетво результатов на страницу
 
-Response:
-[message] - (str) Сообщение сервера
-[success] - (bool) Результат запроса
-[result][page] - (int) Текущая страница
-[result][pageSize] - (int) Количество элементов на странице 
-[result][totalCount] - (int) Общее количество элементов
-[result][pagesCount] - (int) Количество страниц
-[result][items] - (list) Список лицензий
+#### Response:
+* message - *(str)* Сообщение сервера
+* success - *(bool)* Результат запроса
++ result:
+    * page - *(int)* Текущая страница
+    * pageSize -     *(int)    * Количество элементов на странице 
+    * totalCount -     *(int)    * Общее количество элементов
+    * pagesCount -     *(int)    * Количество страниц
+    * items -     *(list)    * Список лицензий
 
-Госконтракты
-Request URL:https://casebook.ru/api/Card/StateContracts?page=23&perpage=30&supplier=3445102073&datefrom=2016-01-01&dateto=2016-12-31
-Request Method:GET
-Query String Parameters:
-    page:1
-    perpage:30
-    supplier:3445102073
-    datefrom:2016-01-01
-    dateto:2016-12-31
+# Госконтракты
+#### Request URL:
+    https://casebook.ru/api/Card/StateContracts?page=23&perpage=30&supplier=3445102073&datefrom=2016-01-01&dateto=2016-12-31
+#### Request Method:
+    GET
+#### Query String Parameters:
 
-page - страница
-perpage - количество элементов на страницу
-supplier - инн организации
+<pre><code>
+    page=1
+    perpage=30
+    supplier=3445102073
+    datefrom=2016-01-01
+    dateto=2016-12-31
+</pre></code>
 
-Response:
-[success] - (bool) Результат выполнения запроса
-[message] - (str) Сообщение сервера
-[result][contracts] - (list) Список госконтрактов. Когда мы получили
-    все контракты и больше получить не можем то этот список возвращается пустым
-    
-    
-Проверки
-Request URL:https://casebook.ru/api/Card/GetAuditPlans
-Request Method:POST
-Request Payload:
+* page - страница
+* perpage - количество элементов на страницу
+* supplier - инн организации
+
+#### Response:
+
+* success - *(bool)* Результат выполнения запроса
+* message - *(str)* Сообщение сервера
++ result:
+    *contracts - *(list)* Список госконтрактов. Когда мы получили </br> все контракты и больше получить не можем то этот список возвращается пустым
+
+# Проверки
+#### Request URL:
+    https://casebook.ru/api/Card/GetAuditPlans
+#### Request Method:
+    POST
+#### Request Payload:
+
+<pre><code>
     {
         "inn":"3445102073",
         "year":2016,
         "page":1
     }
+</pre></code>
     
-Response:
-[success] - (bool) Результат выполнения запроса
-[message] - (str) Сообщение сервера
-[result][items] - (list) Список проверок
+#### Response:
+* success - *(bool)* Результат выполнения запроса
+* message - *(str)* Сообщение сервера
++ result:
+    * items - *(list)* Список проверок
 
-Года доступные для получения проверок
-Request URL:https://casebook.ru/api/Card/GetAuditAvailableYears
-Request Method:GET
-Response:
+# Года доступные для получения проверок
+#### Request URL:
+    https://casebook.ru/api/Card/GetAuditAvailableYears
+#### Request Method:
+    GET
+#### Response:
+
+<pre><code>
     {
       "message": null,
       "serverDate": "2016-08-04T22:58:39.0005428+03:00",
@@ -196,11 +245,16 @@ Response:
       "success": true,
       "timings": null
     }
+</pre></code>
     
-Статистика исполнительных производств
-Request URL:https://casebook.ru/api/Card/ExecutoryProcessesStatistics
-Request Method:POST
-Request Payload:
+# Статистика исполнительных производств
+#### Request URL:
+    https://casebook.ru/api/Card/ExecutoryProcessesStatistics
+#### Request Method:
+    POST
+#### Request Payload:
+
+<pre><code>
     {
     "inn":"3445102073",
     "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
@@ -226,7 +280,11 @@ Request Payload:
     "fieldOrder":0,
     "typeOrder":1
     }
-Response:
+</pre></code>
+    
+#### Response:
+
+<pre><code>
 {
   "message": null,
   "serverDate": "2016-08-04T23:12:30.0000262+03:00",
@@ -241,11 +299,16 @@ Response:
   "success": true,
   "timings": null
 }
+</pre></code>
 
-Исполнительные производства
-Request URL:https://casebook.ru/api/Card/ExecutoryProcesses
-Request Method:POST
-Request Payload:
+# Исполнительные производства
+#### Request URL:
+    https://casebook.ru/api/Card/ExecutoryProcesses
+#### Request Method:
+    POST
+#### Request Payload:
+
+<pre><code>
     {
     "inn":"3445102073",
     "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
@@ -271,21 +334,28 @@ Request Payload:
     "fieldOrder":0,
     "typeOrder":1
     }
+</pre></code>
     
-page - страница
-count - результатов на страницу
+* page - страница
+* count - результатов на страницу
 
-Response:
-    [success] - (bool) Результат выполнения запроса
-    [message] - (str) Сообщение сервера
-    [result][pagesCount] - (int) Количесво страниц
-    [result][executoryProcesses] - (list) Список производств
+#### Response:
+
+* success - *(bool)* Результат выполнения запроса
+* message - *(str)* Сообщение сервера
++ result:
+    * pagesCount - *(int)* Количесво страниц
+    * executoryProcesses - *(list)* Список производств
     
     
-Список арбитражных дел
-Request URL:https://casebook.ru/api/Search/Cases
-Request Method:POST
-Request Payload:
+#Список арбитражных дел
+#### Request URL:
+    https://casebook.ru/api/Search/Cases
+#### Request Method:
+    POST
+#### Request Payload:
+
+<pre><code>
 {
     'accuracy': 0,
     'bankruptStages': None,
@@ -358,11 +428,14 @@ Request Payload:
     'stateOrganizations': None,
     'statusEx': None,
 }
+</pre></code>
 
-dateFrom - дата регистрации компании (RegistrationDate)
-dateTo - дата ликвидации ?
+* dateFrom - дата регистрации компании (RegistrationDate)
+* dateTo - дата ликвидации ?
 
-Response:
+#### Response:
+
+<pre><code>
 {
   "message": "",
   "serverDate": "2016-08-06T12:22:30.0000153+03:00",
@@ -572,11 +645,16 @@ Response:
     "GetCasesList.SortAndMerge 00:00:00"
   ]
 }
+</pre></code>
 
-Краткая статистика арбитражных дел
-Request URL:https://casebook.ru/api/Card/OrgStatShort
-Request Method:POST
-Request Payload:
+# Краткая статистика арбитражных дел
+#### Request URL: 
+    https://casebook.ru/api/Card/OrgStatShort
+#### Request Method:
+    POST
+#### Request Payload:
+
+<pre><code>
 {
     "statusEx":null,
     "sideTypes":null,
@@ -645,8 +723,11 @@ Request Payload:
     "executionsDateTo":null,
     "generalCourts":null
 }
+</pre></code>
 
-Response:
+#### Response:
+
+<pre><code>
 {
   "message": null,
   "serverDate": "2016-08-06T09:08:27.0002762+03:00",
@@ -670,16 +751,22 @@ Response:
     "jsonCamelCase 00:00:00"
   ]
 }
-casesAny - количесво арбитражных дел
-plaintiff - в качестве исца
-respondent - в качестве ответчика
-third - в качестве третьего лица
-sums - исковые требования
+</pre></code>
 
-Статистика арбитражных дел
-Request URL:https://casebook.ru/api/Card/OrgStatBySideTypes
-Request Method:POST
-Request Payload:
+* casesAny - *(int)* количесво арбитражных дел
+* plaintiff - *(int)* в качестве исца
+* respondent - *(int)* в качестве ответчика
+* third - *(int)* в качестве третьего лица
+* sums - *(int)* исковые требования
+
+# Статистика арбитражных дел
+#### Request URL:
+    https://casebook.ru/api/Card/OrgStatBySideTypes
+#### Request Method:
+    POST
+#### Request Payload:
+
+<pre><code>
 {
     "statusEx":null,
     "sideTypes":null,
@@ -749,7 +836,11 @@ Request Payload:
     "executionsDateTo":null,
     "generalCourts":null
 }
-Response:
+</pre></code>
+
+#### Response:
+
+<pre><code>
 {
   "message": null,
   "serverDate": "2016-08-06T09:38:44.0001942+03:00",
@@ -775,9 +866,11 @@ Response:
     "jsonCamelCase 00:00:00"
   ]
 }
-plaintiff - в качестве исца
-respondent - в качестве ответчика
-third - в качестве третьего лица
-casesAny - в качестве иного лица
-counts - количесво дел
-sums - исковые требования
+</pre></code>
+
+* plaintiff - *(int)* в качестве исца
+* respondent - *(int)* в качестве ответчика
+* third - *(int)* в качестве третьего лица
+* casesAny - *(int)* в качестве иного лица
+* counts - *(int)* количесво дел
+* sums - *(int)* исковые требования
