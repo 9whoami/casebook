@@ -39,16 +39,16 @@ def load_backup(dmp_file='obj.dmp'):
 
 api = CasebookAPI()
 login = api.login(email='nemotest@gmail.com', passwd='engrave')
-if login is not True:
-    raise SystemExit(login)
 
 company = api.sides_search(name='лукоил')
 
 # company = load_backup()
 
-if company.get('error') or company.get('Success') is False:
-    print(company)
+if not company.get('Success'):
+    print(company['Message'])
 else:
-    x = company['Result']['Items'][2]
-    stat = api.get_executory_processes_statistics(**x)
-    print(stat)
+    x = company['Result']['Items'][0]
+    # print(api.request_head)
+    stat = api.get_cases(**x)
+    # print(api.request_head)
+    # print(stat)
