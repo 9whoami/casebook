@@ -13,6 +13,7 @@
         'RememberMe': True,
         'SystemName': 'sps'
     }
+    
 </pre></code>
 
 #### Response:
@@ -40,7 +41,7 @@
     POST
 #### Request Pyaload:
 
-<pre><code>    
+```
     {
         "filters": [
             {
@@ -52,7 +53,7 @@
         "page": 1, 
         "count": 30
     }
-</pre></code>
+```
 
 + filtres - фильтры поиска.
     * mode - ?
