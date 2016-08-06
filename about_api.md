@@ -22,13 +22,13 @@
         'ServerDate': '2016-08-05T01:02:17.0007294+03:00'
     }
     
-[Message] - *(str)* Сообщение сервера, например сообщение об ошибке как в данном примере
-[Timings] - *(unknown)* Время ответа сервера
-[Result] - *(unknown)* ?
-[Success] - *(bool)* Результат. В данном случае входи не удался.
-[ServerDate] - *(unknown)* Время сервера
+*[Message] - *(str)* Сообщение сервера, например сообщение об ошибке как в данном примере
+*[Timings] - *(unknown)* Время ответа сервера
+*[Result] - *(unknown)* ?
+*[Success] - *(bool)* Результат. В данном случае входи не удался.
+*[ServerDate] - *(unknown)* Время сервера
 
-(equal sign)
+=(equal sign)
 
 Поиск компаний
 Request Url: https://casebook.ru/api/Search/Sides
