@@ -183,7 +183,7 @@
 
 # Госконтракты
 #### Request URL:
-    https://casebook.ru/api/Card/StateContracts?page=23&perpage=30&supplier=3445102073&datefrom=2016-01-01&dateto=2016-12-31
+    https://casebook.ru/api/Card/StateContracts
 #### Request Method:
     GET
 #### Query String Parameters:

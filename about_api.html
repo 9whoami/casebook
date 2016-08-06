@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<!--
+Backdoc is a tool for backbone-like documentation generation. 
+Backdoc main goal is to help to generate one page documentation from one markdown source file.
+
+https://github.com/chibisov/backdoc
+-->
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="HandheldFriendly" content="true" />
+    <title>Documentation</title>
+
+    <style type="text/css">
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F9F9F9;
+            font-size: 14px;
+            line-height: 22px;
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            color: #333;
+            margin: 0;
+        }
+
+        h3, .h3 {
+            font-size: 24px;
+        }
+        h1, h2, h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h4, .h4 {
+            font-size: 18px;
+        }
+        h4, h5, h6 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        pre {
+            display: block;
+            padding: 9.5px;
+            color: #333;
+            word-break: break-all;
+        }
+
+        a {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        li ul, li ol{
+            margin: 0;
+        }
+
+        .anchor {
+            cursor: pointer;
+        }
+        .anchor .anchor_char{
+            visibility: hidden;
+            padding-left: 0.2em;
+            font-size: 0.9em;
+            opacity: 0.5;
+        }
+        .anchor:hover .anchor_char{
+            visibility: visible;
+        }
+
+        .sidebar{
+            background: #FFF;
+            position: fixed;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 230px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px 0 30px 30px;
+            border-right: 1px solid #bbb;
+            font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif !important;
+        }
+
+        .sidebar ul{
+            margin: 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul a:hover {
+            text-decoration: underline;
+            color: #333;
+        }
+
+        .sidebar > ul > li {
+            margin-top: 15px;
+        }
+
+        .sidebar > ul > li > a {
+            font-weight: bold;
+        }
+
+        .sidebar ul ul {
+            margin-top: 5px;
+            font-size: 11px;
+            line-height: 14px;
+        }
+
+        .sidebar ul ul li:before {
+            content: "- "; 
+        }
+        .sidebar ul ul li {
+            margin-bottom: 3px;
+        }
+        .sidebar ul ul li a {
+            text-decoration: none;
+        }
+
+        .toggle_sidebar_button{
+            display: none;
+            position: fixed;
+            z-index: 11;
+            top: 0;
+            width: 44px;
+            height: 44px;
+            background: #000;
+            background: rgba(0,0,0,0.7);
+            margin-left: 230px;
+        }
+        .toggle_sidebar_button:hover {
+            background: rgba(0,0,0,1);
+            cursor: pointer;
+        }
+            .toggle_sidebar_button .line{
+                height: 2px;
+                width: 21px;
+                margin-left: 11px;
+                margin-top: 5px;
+                background: #FFF;
+            }
+            .toggle_sidebar_button .line:first-child {
+                margin-top: 15px;
+            }
+
+        .main_container {
+            width: 100%;
+            padding-left: 260px;
+            margin: 30px;
+            margin-left: 0px;
+            padding-right: 30px;
+        }
+
+        .main_container p, ul{
+            margin: 25px 0;
+        }
+
+        .main_container ul {
+            list-style: circle;
+            font-size: 13px;
+            line-height: 18px;
+            padding-left: 15px;
+        }        
+
+        pre {
+            font-size: 12px;
+            /*border: 4px solid #bbb;*/
+            border-top: 0;
+            border-bottom: 0;
+            margin: 0px 0 25px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+
+            font-family: Monaco, Consolas, "Lucida Console", monospace;
+            line-height: 18px;
+            font-style: normal;
+            background: none;
+            border-radius: 0px;
+            /*overflow-x: scroll;*/
+
+            word-wrap: normal;
+            white-space: pre;
+        }
+
+        .main_container {
+            width: 840px;
+        }
+
+        .main_container p, ul, pre {
+            width: 100%;
+        }
+
+        code {
+            padding: 0px 3px;
+            color: #333;
+            background: #fff;
+            /*border: 1px solid #ddd;*/
+            zoom: 1;
+            white-space: pre-wrap;
+            border-radius: 0;
+            font-family: Monaco, Consolas, "Lucida Console", monospace;
+            font-size: 12px;
+            line-height: 18px;
+            font-style: normal;
+        }
+
+        em {
+            font-size: 12px;
+            line-height: 18px;
+        }
+
+        @media (max-width: 820px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main_container {
+                padding: 0px;
+                width: 100%;
+            }
+
+            .main_container > *{
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .main_container > ul, 
+            .main_container > ol {
+                padding-left: 27px;
+            }
+            .force_show_sidebar .main_container {
+                padding-left: 0 !important;
+            }
+            .force_show_sidebar .sidebar {
+                width: 100%;
+                position:fixed;
+                top:0;
+                left:0;
+                bottom:0;
+            }
+            .force_show_sidebar .sidebar a{
+                font-size: 1.5em;
+                line-height: 1.5em;
+            }
+            .force_show_sidebar .toggle_sidebar_button {
+                right: 0;
+            }
+            .force_show_sidebar .toggle_sidebar_button .line:first-child, 
+            .force_show_sidebar .toggle_sidebar_button .line:last-child {
+                visibility: hidden;
+            }
+
+            .toggle_sidebar_button {
+                margin-left: 0px;
+                display: block;
+            }
+
+            pre {
+                font-size: 12px;
+                border: 1px solid #bbb;
+                border-left: 0;
+                border-right: 0;
+                padding: 9px;
+                background: #FFF;
+            }
+
+            code {
+                word-wrap: break-word;
+                white-space: normal;
+            }
+        }
+
+        .force_show_sidebar .sidebar {
+            display: block;
+        }
+
+        .force_show_sidebar .main_container {
+            padding-left: 260px;
+        }
+
+        .force_show_sidebar .toggle_sidebar_button{
+            margin-left: 230px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        /**
+         * Toggle class for an element. Analogue of jQuery.toggleClass().
+         * Compatibility: IE9+
+         * Source: http://youmightnotneedjquery.com/#toggle_class
+         *
+         * @param el
+         * @param className
+         */
+        function toggleClass(el, className) {
+            if (el.classList) {
+                el.classList.toggle(className);
+            } else {
+                var classes = el.className.split(' ');
+                var existingIndex = classes.indexOf(className);
+
+                if (existingIndex >= 0)
+                    classes.splice(existingIndex, 1);
+                else
+                    classes.push(className);
+
+                el.className = classes.join(' ');
+            }
+        }
+
+        /**
+         * Remove class from an element. Analogue of jQuery.removeClass().
+         * Compatibility: IE8+
+         * Source: http://youmightnotneedjquery.com/#remove_class
+         *
+         * @param el
+         * @param className
+         */
+        function removeClass(el, className) {
+            if (el.classList)
+                el.classList.remove(className);
+            else
+                el.className = el.className.replace(new RegExp('(^|\b)' + className.split(' ').join('|') + '(\b|$)', 'gi'), ' ');
+        }
+
+        /**
+         * Add Class. Analogue of jQuery.addClass().
+         * Compatibility: IE8+
+         * Source: http://youmightnotneedjquery.com/#add_class
+         *
+         * @param el
+         * @param className
+         */
+        function addClass(el, className) {
+            if (el.classList)
+                el.classList.add(className);
+            else
+                el.className += ' ' + className;
+        }
+
+
+        /**
+         * Perform a function once DOM loaded. Analogue of jQuery.ready().
+         * Compatibility: IE9+
+         * Source: http://youmightnotneedjquery.com/#ready
+         *
+         * @param fn
+         */
+        function ready(fn) {
+            if (document.readyState != 'loading'){
+                fn();
+            } else {
+                document.addEventListener('DOMContentLoaded', fn);
+            }
+        }
+
+        /**
+         * Find all children. Analogue of jQuery.find().
+         * Compatibility: IE8+
+         * Source: http://youmightnotneedjquery.com/#find_children
+         */
+        function findAll(el, selector) {
+            return el.querySelectorAll(selector);
+        }
+
+        /**
+         * Find one child. Analogue of jQuery.find().first().
+         * Compatibility: IE8+
+         * Source: http://youmightnotneedjquery.com/#find_children
+         */
+        function findOne(el, selector) {
+            return el.querySelector(selector);
+        }
+
+        /**
+         * Append element. Analogue of jQuery.append().
+         * Compatibility: IE8+
+         * Source: http://youmightnotneedjquery.com/#append
+         */
+        function append(parent, el) {
+            parent.appendChild(el);
+        }
+
+        ready(
+            function() {
+                findOne(document, '.toggle_sidebar_button').onclick = function(){
+                    toggleClass(findOne(document, 'body'), 'force_show_sidebar');
+                    return false;
+                };
+
+                // hide sidebar on every click in menu (if small screen)
+                // forEach compatibility: IE9+
+                Array.prototype.forEach.call(findAll(document, '.sidebar a'), function(el, i){
+                    el.onclick = function(){
+                        removeClass(findOne(document, 'body'), 'force_show_sidebar');
+                    };
+                });
+
+                // add anchors
+                Array.prototype.forEach.call(findAll(findOne(document, '.main_container'), 'h1,h2,h3,h4,h5,h6'), function(item, key){
+                    // getAttribute compatibility: IE8+
+                    // Analogue for jQuery.attr()
+                    if(item.getAttribute('id').length > 0) {
+                        addClass(item, 'anchor');
+
+                        var anchor_char = document.createElement('span');
+                        addClass(anchor_char, 'anchor_char');
+                        anchor_char.innerHTML = '&para;';
+
+                        append(item, anchor_char);
+                        item.onclick = function(){
+                            location.hash = item.getAttribute('id');
+                        };
+                    }
+                });
+
+                // remove <code> tag inside of <pre>
+                Array.prototype.forEach.call(findAll(document, 'pre > code'), function(item, key){
+                    // parentNode compatibility: IE8+
+                    // Analogue for jQuery.parent()
+                    item.parentNode.innerHTML = item.innerHTML;
+                });
+            }
+        );
+    </script>
+</head>
+<body>
+    <a class="toggle_sidebar_button">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </a>
+    <div class="sidebar">
+        <ul>
+  <li><a href="#vhod">Вход</a>
+  <ul>
+    <li><a href="#request-url:">Request Url:</a></li>
+    <li><a href="#request-method:">Request method:</a></li>
+    <li><a href="#request-pyaload:">Request Pyaload:</a></li>
+    <li><a href="#response:">Response:</a></li>
+  </ul></li>
+  <li><a href="#poisk-kompanij">Поиск компаний</a>
+  <ul>
+    <li><a href="#request-url:-2">Request Url:</a></li>
+    <li><a href="#request-method:-2">Request method:</a></li>
+    <li><a href="#request-pyaload:-2">Request Pyaload:</a></li>
+    <li><a href="#response:-2">Response:</a></li>
+  </ul></li>
+  <li><a href="#buhgalterskaya-otchetnost">Бухгалтерская отчетность</a>
+  <ul>
+    <li><a href="#request-url:-3">Request Url:</a></li>
+    <li><a href="#request-method:-3">Request method:</a></li>
+    <li><a href="#request-pyaload:-3">Request Pyaload:</a></li>
+    <li><a href="#response:-3">Response:</a></li>
+  </ul></li>
+  <li><a href="#formirovanie-ssyilki-na-egryul">Формирование ссылки на ЕГРЮЛ</a>
+  <ul>
+    <li><a href="#request-url:-4">Request Url:</a></li>
+    <li><a href="#request-method:-4">Request method:</a></li>
+    <li><a href="#query-string-parameters:">Query String Parameters:</a></li>
+  </ul></li>
+  <li><a href="#obschaya-informatsiya-o-kompanii">Общая информация о компании</a>
+  <ul>
+    <li><a href="#request-url:-5">Request Url:</a></li>
+    <li><a href="#request-method:-5">Request method:</a></li>
+    <li><a href="#request-pyaload:-4">Request Pyaload:</a></li>
+    <li><a href="#response:-4">Response:</a></li>
+  </ul></li>
+  <li><a href="#litsenzii">Лицензии</a>
+  <ul>
+    <li><a href="#request-url:-6">Request URL:</a></li>
+    <li><a href="#request-method:-6">Request Method:</a></li>
+    <li><a href="#requestpayload:">RequestPayload:</a></li>
+    <li><a href="#response:-5">Response:</a></li>
+  </ul></li>
+  <li><a href="#goskontraktyi">Госконтракты</a>
+  <ul>
+    <li><a href="#request-url:-7">Request URL:</a></li>
+    <li><a href="#request-method:-7">Request Method:</a></li>
+    <li><a href="#query-string-parameters:-2">Query String Parameters:</a></li>
+    <li><a href="#response:-6">Response:</a></li>
+  </ul></li>
+  <li><a href="#proverki">Проверки</a>
+  <ul>
+    <li><a href="#request-url:-8">Request URL:</a></li>
+    <li><a href="#request-method:-8">Request Method:</a></li>
+    <li><a href="#request-payload:">Request Payload:</a></li>
+    <li><a href="#response:-7">Response:</a></li>
+  </ul></li>
+  <li><a href="#goda-dostupnyie-dlya-polucheniya-proverok">Года доступные для получения проверок</a>
+  <ul>
+    <li><a href="#request-url:-9">Request URL:</a></li>
+    <li><a href="#request-method:-9">Request Method:</a></li>
+    <li><a href="#response:-8">Response:</a></li>
+  </ul></li>
+  <li><a href="#statistika-ispolnitelnyih-proizvodstv">Статистика исполнительных производств</a>
+  <ul>
+    <li><a href="#request-url:-10">Request URL:</a></li>
+    <li><a href="#request-method:-10">Request Method:</a></li>
+    <li><a href="#request-payload:-2">Request Payload:</a></li>
+    <li><a href="#response:-9">Response:</a></li>
+  </ul></li>
+  <li><a href="#ispolnitelnyie-proizvodstva">Исполнительные производства</a>
+  <ul>
+    <li><a href="#request-url:-11">Request URL:</a></li>
+    <li><a href="#request-method:-11">Request Method:</a></li>
+    <li><a href="#request-payload:-3">Request Payload:</a></li>
+    <li><a href="#response:-10">Response:</a></li>
+    <li><a href="#request-url:-12">Request URL:</a></li>
+    <li><a href="#request-method:-12">Request Method:</a></li>
+    <li><a href="#request-payload:-4">Request Payload:</a></li>
+    <li><a href="#response:-11">Response:</a></li>
+  </ul></li>
+  <li><a href="#kratkaya-statistika-arbitrazhnyih-del">Краткая статистика арбитражных дел</a>
+  <ul>
+    <li><a href="#request-url:-13">Request URL:</a></li>
+    <li><a href="#request-method:-13">Request Method:</a></li>
+    <li><a href="#request-payload:-5">Request Payload:</a></li>
+    <li><a href="#response:-12">Response:</a></li>
+  </ul></li>
+  <li><a href="#statistika-arbitrazhnyih-del">Статистика арбитражных дел</a>
+  <ul>
+    <li><a href="#request-url:-14">Request URL:</a></li>
+    <li><a href="#request-method:-14">Request Method:</a></li>
+    <li><a href="#request-payload:-6">Request Payload:</a></li>
+    <li><a href="#response:-13">Response:</a></li>
+  </ul></li>
+</ul>
+
+    </div>
+    <div class="main_container">
+        <h1 id="vhod">Вход</h1>
+
+<h4 id="request-url:">Request Url:</h4>
+
+<pre><code>https://casebook.ru/api/Account/LogOn
+</code></pre>
+
+<h4 id="request-method:">Request method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-pyaload:">Request Pyaload:</h4>
+
+<pre><code>{
+    'UserName': email_adress,
+    'Password': password,
+    'RememberMe': True,
+    'SystemName': 'sps'
+}
+</code></pre>
+
+<h4 id="response:">Response:</h4>
+
+<p><code>
+    {
+        'Message': 'Активируйте аккаунт по ссылке в письме.', 
+        'Timings': None, 
+        'Result': None, 
+        'Success': False, 
+        'ServerDate': '2016-08-05T01:02:17.0007294+03:00'
+    }
+</code></p>
+
+<ul>
+<li>Message - <em>(str)</em> Сообщение сервера, например сообщение об ошибке как в данном примере</li>
+<li>Timings - <em>(unknown)</em> Время ответа сервера</li>
+<li>Result - <em>(unknown)</em> ?</li>
+<li>Success - <em>(bool)</em> Результат. В данном случае входи не удался.</li>
+<li>ServerDate - <em>(unknown)</em> Время сервера</li>
+</ul>
+
+<h1 id="poisk-kompanij">Поиск компаний</h1>
+
+<h4 id="request-url:-2">Request Url:</h4>
+
+<pre><code>https://casebook.ru/api/Search/Sides
+</code></pre>
+
+<h4 id="request-method:-2">Request method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-pyaload:-2">Request Pyaload:</h4>
+
+<p><code>
+    {
+        "filters": [
+            {
+                'mode': "Contains", 
+                "type": "Name", 
+                "value": 'лукоил'
+            }
+        ], 
+        "page": 1, 
+        "count": 30
+    }
+</code></p>
+
+<ul>
+<li>filtres - фильтры поиска.
+<ul>
+<li>mode - ?</li>
+<li>type - Тип поиска. Возможен поиск по хэшу.</li>
+<li>value - поисковая строка</li>
+</ul></li>
+<li>page - страница</li>
+<li>count - количесво элементов на странице</li>
+</ul>
+
+<h4 id="response:-2">Response:</h4>
+
+<blockquote>
+  <p>В ответ получим json со списком компаний. Основные ключи опписаны ниже.</p>
+</blockquote>
+
+<ul>
+<li>Result.Items - <em>(list)</em> Список компаний</li>
+<li>Success - <em>(bool)</em> Результат запроса</li>
+<li>Message - <em>(str)</em> Сообщение сервера</li>
+<li>Result - <em>(dict)</em> Резултат поиска
+<ul>
+<li>Page - <em>(int)</em> Текущая страница</li>
+<li>PageSize - <em>(int)</em> Количество элементов</li>
+<li>PageCount - <em>(int)</em> Количество страниц</li>
+<li>TotalCount - <em>(int)</em> Общее количесво найденых компаний</li>
+</ul></li>
+</ul>
+
+<h1 id="buhgalterskaya-otchetnost">Бухгалтерская отчетность</h1>
+
+<h4 id="request-url:-3">Request Url:</h4>
+
+<pre><code>https://casebook.ru/api/Card/AccountingStat
+</code></pre>
+
+<h4 id="request-method:-3">Request method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-pyaload:-3">Request Pyaload:</h4>
+
+<p><code>
+    {
+        "inn":"5433178674",
+        "yearFrom":2009,
+        "yearTo":2009
+    }
+</code></p>
+
+<blockquote>
+  <p>Параметры yearFrom и yearTo необязательны</p>
+</blockquote>
+
+<h4 id="response:-3">Response:</h4>
+
+<ul>
+<li>Message - <em>(str)</em> Сообщение сервера</li>
+<li>Success - <em>(bool)</em> Результат запроса</li>
+<li>Result:
+<ul>
+<li>AvailableDateTimeRanges - <em>(dict)</em> Список доступных временных интервалов</li>
+<li>GroupReports - <em>(list)</em> ?</li>
+<li>NotCompareReports - <em>(list)</em> ?</li>
+</ul></li>
+</ul>
+
+<h1 id="formirovanie-ssyilki-na-egryul">Формирование ссылки на ЕГРЮЛ</h1>
+
+<h4 id="request-url:-4">Request Url:</h4>
+
+<pre><code>https://casebook.ru/api/Card/Excerpt
+</code></pre>
+
+<h4 id="request-method:-4">Request method:</h4>
+
+<pre><code>GET
+</code></pre>
+
+<h4 id="query-string-parameters:">Query String Parameters:</h4>
+
+<p><code>
+    Inn=5433178674
+    Name=ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ ПРОФИЛЬНАЯ ИННОВАЦИОННАЯ КОМПАНИЯ "ХАРТИЯ БЕЗОПАСНОСТИ"
+    ShortName=ООО ПИК "ХАРТИЯ БЕЗОПАСНОСТИ"
+    Address=630559, НОВОСИБИРСКАЯ ОБЛАСТЬ, РАБОЧИЙ ПОСЕЛОК КОЛЬЦОВО, УЛИЦА ТЕХНОПАРКОВАЯ, Д. 1 
+    Ogrn=1095475003821
+    Okpo=62883530 
+    IsBranch=
+    OrganizationId=
+    OrganizationDictId=
+    StorageId=6923889
+    IsNotPrecise=
+    HeadFio=ЛЬВУТИН ПАВЕЛ ЭДУАРДОВИЧ
+    StatusId= 
+    useCache=True
+</code></p>
+
+<ul>
+<li>useCache - всегда True. Все остальное берется из инфы о компании. </li>
+</ul>
+
+<blockquote>
+  <p>Все ключи обязательны, даже если они пустые</p>
+</blockquote>
+
+<h1 id="obschaya-informatsiya-o-kompanii">Общая информация о компании</h1>
+
+<h4 id="request-url:-5">Request Url:</h4>
+
+<pre><code>https://casebook.ru/api/Card/BusinessCard
+</code></pre>
+
+<h4 id="request-method:-5">Request method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-pyaload:-4">Request Pyaload:</h4>
+
+<p><code>
+    {
+        'IsUnique': None, 
+        'IsPhysical': False, 
+        'Okpo': '62883530', 
+        'OrganizationId': 0, 
+        'Name': 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ ПРОФИЛЬНАЯ ИННОВАЦИОННАЯ КОМПАНИЯ "ХАРТИЯ БЕЗОПАСНОСТИ"', 
+        'Ogrn': '1095475003821', 
+        'Address': '630559, НОВОСИБИРСКАЯ ОБЛАСТЬ, РАБОЧИЙ ПОСЕЛОК КОЛЬЦОВО, УЛИЦА ТЕХНОПАРКОВАЯ, Д. 1'
+    }
+</code></p>
+
+<h4 id="response:-4">Response:</h4>
+
+<ul>
+<li>Success - <em>(bool)</em> Результат запроса</li>
+<li>Message - <em>(str)</em> Сообщение сервера</li>
+<li>Result - <em>(dict)</em> Общая информация о компании</li>
+</ul>
+
+<h1 id="litsenzii">Лицензии</h1>
+
+<h4 id="request-url:-6">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/Licenses
+</code></pre>
+
+<h4 id="request-method:-6">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="requestpayload:">RequestPayload:</h4>
+
+<p><code>
+    {
+        "page":1,
+        "count":30,
+        "inn":"3445102073",
+        "ogrn":"1093460001095"
+    }
+</code></p>
+
+<blockquote>
+  <p>page - Страница
+  count - Количетво результатов на страницу</p>
+</blockquote>
+
+<h4 id="response:-5">Response:</h4>
+
+<ul>
+<li>message - <em>(str)</em> Сообщение сервера</li>
+<li>success - <em>(bool)</em> Результат запроса</li>
+<li>result:
+<ul>
+<li>page - <em>(int)</em> Текущая страница</li>
+<li>pageSize -     *(int)    * Количество элементов на странице </li>
+<li>totalCount -     *(int)    * Общее количество элементов</li>
+<li>pagesCount -     *(int)    * Количество страниц</li>
+<li>items -     *(list)    * Список лицензий</li>
+</ul></li>
+</ul>
+
+<h1 id="goskontraktyi">Госконтракты</h1>
+
+<h4 id="request-url:-7">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/StateContracts
+</code></pre>
+
+<h4 id="request-method:-7">Request Method:</h4>
+
+<pre><code>GET
+</code></pre>
+
+<h4 id="query-string-parameters:-2">Query String Parameters:</h4>
+
+<p><code>
+    page=1
+    perpage=30
+    supplier=3445102073
+    datefrom=2016-01-01
+    dateto=2016-12-31
+</code></p>
+
+<ul>
+<li>page - страница</li>
+<li>perpage - количество элементов на страницу</li>
+<li>supplier - инн организации</li>
+</ul>
+
+<h4 id="response:-6">Response:</h4>
+
+<ul>
+<li>success - <em>(bool)</em> Результат выполнения запроса</li>
+<li>message - <em>(str)</em> Сообщение сервера</li>
+<li>result:
+<em>contracts - *(list)</em> Список госконтрактов. Когда мы получили </br> все контракты и больше получить не можем то этот список возвращается пустым</li>
+</ul>
+
+<h1 id="proverki">Проверки</h1>
+
+<h4 id="request-url:-8">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/GetAuditPlans
+</code></pre>
+
+<h4 id="request-method:-8">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-payload:">Request Payload:</h4>
+
+<p><code>
+    {
+        "inn":"3445102073",
+        "year":2016,
+        "page":1
+    }
+</code></p>
+
+<h4 id="response:-7">Response:</h4>
+
+<ul>
+<li>success - <em>(bool)</em> Результат выполнения запроса</li>
+<li>message - <em>(str)</em> Сообщение сервера</li>
+<li>result:
+<ul>
+<li>items - <em>(list)</em> Список проверок</li>
+</ul></li>
+</ul>
+
+<h1 id="goda-dostupnyie-dlya-polucheniya-proverok">Года доступные для получения проверок</h1>
+
+<h4 id="request-url:-9">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/GetAuditAvailableYears
+</code></pre>
+
+<h4 id="request-method:-9">Request Method:</h4>
+
+<pre><code>GET
+</code></pre>
+
+<h4 id="response:-8">Response:</h4>
+
+<p><code>
+    {
+      "message": null,
+      "serverDate": "2016-08-04T22:58:39.0005428+03:00",
+      "result": [
+        2015,
+        2016
+      ],
+      "success": true,
+      "timings": null
+    }
+</code></p>
+
+<h1 id="statistika-ispolnitelnyih-proizvodstv">Статистика исполнительных производств</h1>
+
+<h4 id="request-url:-10">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/ExecutoryProcessesStatistics
+</code></pre>
+
+<h4 id="request-method:-10">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-payload:-2">Request Payload:</h4>
+
+<p><code>
+    {
+    "inn":"3445102073",
+    "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
+    "shortName":"ООО \"ЛУКОЙЛ-ТТК\"",
+    "address":"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+    "ogrn":"1093460001095",
+    "okpo":"60915315",
+    "isUnique":false,
+    "isBranch":false,
+    "organizationDictId":null,
+    "storageId":4477117,
+    "statusId":null,
+    "organizationName":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
+    "organizationInn":"3445102073",
+    "executoryObjectIds":null,
+    "executoryProcessStatus":-1,
+    "minSum":0,
+    "maxSum":-1,
+    "dateFrom":null,
+    "dateTo":null,
+    "page":1,
+    "count":30,
+    "fieldOrder":0,
+    "typeOrder":1
+    }
+</code></p>
+
+<h4 id="response:-9">Response:</h4>
+
+<p><code>
+{
+  "message": null,
+  "serverDate": "2016-08-04T23:12:30.0000262+03:00",
+  "result": {
+    "totalCount": 43,
+    "totalSum": 1806462.72,
+    "completedCount": 39,
+    "completedSum": 1748265.34,
+    "currentCount": 4,
+    "currentSum": 58197.38
+  },
+  "success": true,
+  "timings": null
+}
+</code></p>
+
+<h1 id="ispolnitelnyie-proizvodstva">Исполнительные производства</h1>
+
+<h4 id="request-url:-11">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/ExecutoryProcesses
+</code></pre>
+
+<h4 id="request-method:-11">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-payload:-3">Request Payload:</h4>
+
+<p><code>
+    {
+    "inn":"3445102073",
+    "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
+    "shortName":"ООО \"ЛУКОЙЛ-ТТК\"",
+    "address":"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+    "ogrn":"1093460001095",
+    "okpo":"60915315",
+    "isUnique":false,
+    "isBranch":false,
+    "organizationDictId":null,
+    "storageId":4477117,
+    "statusId":null,
+    "organizationName":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"",
+    "organizationInn":"3445102073",
+    "executoryObjectIds":null,
+    "executoryProcessStatus":-1,
+    "minSum":0,
+    "maxSum":-1,
+    "dateFrom":null,
+    "dateTo":null,
+    "page":1,
+    "count":30,
+    "fieldOrder":0,
+    "typeOrder":1
+    }
+</code></p>
+
+<ul>
+<li>page - страница</li>
+<li>count - результатов на страницу</li>
+</ul>
+
+<h4 id="response:-10">Response:</h4>
+
+<ul>
+<li>success - <em>(bool)</em> Результат выполнения запроса</li>
+<li>message - <em>(str)</em> Сообщение сервера</li>
+<li>result:
+<ul>
+<li>pagesCount - <em>(int)</em> Количесво страниц</li>
+<li>executoryProcesses - <em>(list)</em> Список производств</li>
+</ul></li>
+</ul>
+
+<p>#Список арбитражных дел</p>
+
+<h4 id="request-url:-12">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Search/Cases
+</code></pre>
+
+<h4 id="request-method:-12">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-payload:-4">Request Payload:</h4>
+
+<p><code>
+{
+    'accuracy': 0,
+    'bankruptStages': None,
+    'caseCategoryId': None,
+    'caseResults': None,
+    'caseTypes': None,
+    'coSides': [],
+    'considerType': -1,
+    'count': 30,
+    'courtType': -1,
+    'courts': None,
+    'dateFrom': "2009-03-05",
+    'dateTo': None,
+    'delegate': "",
+    'executionObject': None,
+    'executionStatus': -1,
+    'executionsDateFrom': None,
+    'executionsDateTo': None,
+    'finalDocFrom': None,
+    'finalDocTo': None,
+    'generalCaseTypes': None,
+    'generalCourts': None,
+    'instances': None,
+    'isCasesTracking': True,
+    'isMessageFrTracking': True,
+    'isNeedAccuracy': 2,
+    'isNeedFnsChanges': True,
+    'isNeedMAClaims': True,
+    'isNeedNewCasesTracking': True,
+    'isNeedWritsTracking': False,
+    'judges': None,
+    'maxExecutionSum': -1,
+    'maxSum': -1,
+    'minExecutionSum': 0,
+    'minSum': 0,
+    'monitoredStatus': -1,
+    'orderBy': "incoming_date_ts desc, case_number desc",
+    'page': 1,
+    'sessionFrom': None,
+    'sessionTo': None,
+    'side': None,
+    'sideTypes': None,
+    'sides': [
+        {
+            'address': "400066, ВОЛГОГРАДСКАЯ обл, ВОЛГОГРАД г, ИМ СКОСЫРЕВА ул, д.7",
+            'inn': "3445102073",
+            'isBranch': False,
+            'isOriginal': True,
+            'name': "ООО ЛУКОЙЛ - Теплотранспортная компания",
+            'ogrn': "1093460001095",
+            'okpo': "",
+            'shortName': "ООО ЛУКОЙЛ - Теплотранспортная компания",
+            'statusId': None,
+            'statusName': None,
+        },
+        {
+            'address': "400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+            'inn': "3445102073",
+            'isBranch': False,
+            'isUnique': False,
+            'name': 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ЛУКОЙЛ - ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ"',
+            'ogrn': "1093460001095",
+            'okpo': "60915315",
+            'organizationDictId': None,
+            'shortName': "ООО ЛУКОЙЛ - ТТК",
+            'statusId': None,
+            'storageId': 4477117,
+        }
+    ],
+    'stateOrganizations': None,
+    'statusEx': None,
+}
+</code></p>
+
+<ul>
+<li>dateFrom - дата регистрации компании (RegistrationDate)</li>
+<li>dateTo - дата ликвидации ?</li>
+</ul>
+
+<h4 id="response:-11">Response:</h4>
+
+<p><code>
+{
+  "message": "",
+  "serverDate": "2016-08-06T12:22:30.0000153+03:00",
+  "result": {
+    "maxSum": -1.0,
+    "foundSideIdByCaseId": {
+      "1cbcf7e3-601d-4cb1-8ade-bd47df34e62d": 0
+    },
+    "page": 1,
+    "pageSize": 30,
+    "totalCount": 1,
+    "pagesCount": 1,
+    "items": [
+      {
+        "caseId": "1cbcf7e3-601d-4cb1-8ade-bd47df34e62d",
+        "foundInstanceId": "00000000-0000-0000-0000-000000000000",
+        "caseNumber": "А40-250397/2015",
+        "startDate": "2015-12-23T00:00:00",
+        "finishDate": "2016-02-20T00:00:00",
+        "judgeId": "00000000-0000-0000-0000-000000000000",
+        "judge": null,
+        "court": null,
+        "instances": [
+          {
+            "court": "АС города Москвы",
+            "judge": "Завершено в",
+            "courtTag": "MSK",
+            "instanceLevel": 1,
+            "finishState": 2,
+            "finishDate": "2016-02-20T00:00:00",
+            "incomingDate": "2015-12-23T00:00:00",
+            "judgeId": "00000000-0000-0000-0000-000000000000",
+            "judges": [
+              {
+                "id": "beb7f6ea-4caa-447c-a275-572bbe223aa6",
+                "role": 0
+              }
+            ]
+          }
+        ],
+        "courts": null,
+        "sides": [
+          {
+            "sideType": 0,
+            "type": 0,
+            "fakeId": 7668492,
+            "sideId": null,
+            "typeName": null,
+            "birthPlace": null,
+            "birthDate": null,
+            "snils": null,
+            "statusName": null,
+            "statusId": null,
+            "organizationId": 0,
+            "cardType": 0,
+            "isBranch": false,
+            "isUnique": null,
+            "isNotPrecise": false,
+            "region": null,
+            "orgForm": null,
+            "headFio": null,
+            "storageId": null,
+            "isPhysical": false,
+            "isMonitored": false,
+            "inFolders": null,
+            "organizationDictId": null,
+            "isFavorite": false,
+            "comment": null,
+            "registrationDate": "0001-01-01T00:00:00",
+            "shortName": "ООО \"ГЛОБУС\"",
+            "name": "ООО \"ГЛОБУС\"",
+            "inn": "7733850530",
+            "ogrn": "1137746698616",
+            "okpo": null,
+            "hidePersonalData": null,
+            "address": "125363, Москва г, Фабрициуса ул, 33А, стр. 17"
+          },
+          {
+            "sideType": 0,
+            "type": 0,
+            "fakeId": 7668495,
+            "sideId": null,
+            "typeName": null,
+            "birthPlace": null,
+            "birthDate": null,
+            "snils": null,
+            "statusName": null,
+            "statusId": null,
+            "organizationId": 0,
+            "cardType": 0,
+            "isBranch": false,
+            "isUnique": null,
+            "isNotPrecise": false,
+            "region": null,
+            "orgForm": null,
+            "headFio": null,
+            "storageId": null,
+            "isPhysical": false,
+            "isMonitored": false,
+            "inFolders": null,
+            "organizationDictId": null,
+            "isFavorite": false,
+            "comment": null,
+            "registrationDate": "0001-01-01T00:00:00",
+            "shortName": "ООО Глобус",
+            "name": "ООО Глобус",
+            "inn": "",
+            "ogrn": "",
+            "okpo": null,
+            "hidePersonalData": null,
+            "address": "142101, Московская обл, Подольск г ул Плещеевская д 56 а/я 16"
+          },
+          {
+            "sideType": 1,
+            "type": 1,
+            "fakeId": 7668493,
+            "sideId": null,
+            "typeName": null,
+            "birthPlace": null,
+            "birthDate": null,
+            "snils": null,
+            "statusName": null,
+            "statusId": null,
+            "organizationId": 0,
+            "cardType": 0,
+            "isBranch": false,
+            "isUnique": null,
+            "isNotPrecise": false,
+            "region": null,
+            "orgForm": null,
+            "headFio": null,
+            "storageId": null,
+            "isPhysical": false,
+            "isMonitored": false,
+            "inFolders": null,
+            "organizationDictId": null,
+            "isFavorite": false,
+            "comment": null,
+            "registrationDate": "0001-01-01T00:00:00",
+            "shortName": "ООО \"ЛУКОИЛ-БРЕНД\"",
+            "name": "ООО \"ЛУКОИЛ-БРЕНД\"",
+            "inn": "5009098617",
+            "ogrn": "1155009001806",
+            "okpo": null,
+            "hidePersonalData": null,
+            "address": "142063, Московская обл, Домодедово г, Поздново, стр. 20"
+          }
+        ],
+        "lastEvents": [
+          {
+            "date": "2016-03-25T00:00:00",
+            "description": "Возврат госпошлины",
+            "contentTypes": null,
+            "decisionType": null,
+            "documentId": null,
+            "court": "АС города Москвы",
+            "instanceLevel": 1,
+            "judge": null,
+            "judgeId": "00000000-0000-0000-0000-000000000000",
+            "declarer": null,
+            "declarerInfo": null,
+            "instanceNumber": "А40-250397/2015",
+            "instanceId": "00000000-0000-0000-0000-000000000000",
+            "needJudges": false,
+            "typeName": null,
+            "documentFileName": null,
+            "appealedDocuments": null
+          }
+        ],
+        "nextEvent": null,
+        "bankruptStage": null,
+        "status": "Рассмотрение дела завершено",
+        "caseTypeMCode": "Г",
+        "caseCategory": "О неисполнении или ненадлежащем исполнении обязательств по договорам поставки",
+        "caseCategoryId": "f205f4d1-bbb4-4766-835d-300e262fe38a",
+        "caseType": "",
+        "claimSum": 1326931.0,
+        "recoverySum": null,
+        "comment": "ООО \"ГЛОБУС\" против ООО \"ЛУКОИЛ-БРЕНД\". О неисполнении или ненадлежащем исполнении обязательств по договорам поставки. ",
+        "isMonitored": false,
+        "inFolders": [],
+        "isFavorite": false,
+        "updatesCount": 0,
+        "isGJ": false,
+        "isSimpleJustice": false,
+        "isFlBankruptcy": false,
+        "responsibleUsers": null,
+        "lastComment": null,
+        "caseResult": 0,
+        "caseDuration": 60
+      }
+    ]
+  },
+  "success": true,
+  "timings": [
+    "GetCasesIdsFormSearcher 00:00:00.2020000",
+    "ElasticSearch 00:00:00.2020000",
+    "Elastic.Took 00:00:00.1650000",
+    "GetCasesList.monitoredCases 00:00:00.0500000",
+    "GetCasesList.nonViewedCases 00:00:00.0130000",
+    "GetUserFavoriteCasesIds 00:00:00.0090000",
+    "GetCasesList.favoriteCases 00:00:00.0090000",
+    "GetCasesList.comments 00:00:00.0040000",
+    "GetCasesList.bankruptStages 00:00:00",
+    "jsonCamelCase 00:00:00",
+    "GetCasesList.Sql 00:00:00",
+    "GetCasesList.SortAndMerge 00:00:00"
+  ]
+}
+</code></p>
+
+<h1 id="kratkaya-statistika-arbitrazhnyih-del">Краткая статистика арбитражных дел</h1>
+
+<h4 id="request-url:-13">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/OrgStatShort
+</code></pre>
+
+<h4 id="request-method:-13">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-payload:-5">Request Payload:</h4>
+
+<p><code>
+{
+    "statusEx":null,
+    "sideTypes":null,
+    "monitoredStatus":-1,
+    "considerType":-1,
+    "courtType":-1,
+    "caseResults":null,
+    "caseTypes":null,
+    "caseCategoryId":null,
+    "bankruptStages":null,
+    "courts":null,
+    "instances":null,
+    "judges":null,
+    "delegate":"",
+    "stateOrganizations":null,
+    "isNeedFnsChanges":true,
+    "isNeedMAClaims":true,
+    "isNeedAccuracy":2,
+    "isNeedWritsTracking":false,
+    "isNeedNewCasesTracking":true,
+    "isMessageFrTracking":true,
+    "isCasesTracking":true,
+    "dateFrom":"2009-03-05",
+    "dateTo":null,
+    "sessionFrom":null,
+    "sessionTo":null,
+    "finalDocFrom":null,
+    "finalDocTo":null,
+    "minSum":0,
+    "maxSum":-1,
+    "sides":[
+        {
+            "name":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"",
+            "shortName":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"",
+            "inn":"3445102073",
+            "ogrn":"1093460001095",
+            "okpo":"",
+            "address":"400066, ВОЛГОГРАДСКАЯ обл, ВОЛГОГРАД г, ИМ СКОСЫРЕВА ул, д.7",
+            "statusId":null,
+            "statusName":null,
+            "isBranch":false,
+            "isOriginal":true
+        },
+        {
+            "inn":"3445102073",
+            "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"","shortName":"ООО \"ЛУКОЙЛ-ТТК\"",
+            "address":"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+            "ogrn":"1093460001095",
+            "okpo":"60915315",
+            "isUnique":false,
+            "isBranch":false,
+            "organizationDictId":null,
+            "storageId":4477117,
+            "statusId":null
+        }
+    ],
+    "coSides":[],
+    "accuracy":0,
+    "generalCaseTypes":null,
+    "side":null,
+    "executionObject":null,
+    "executionStatus":-1,
+    "minExecutionSum":0,
+    "maxExecutionSum":-1,
+    "executionsDateFrom":null,
+    "executionsDateTo":null,
+    "generalCourts":null
+}
+</code></p>
+
+<h4 id="response:-12">Response:</h4>
+
+<p><code>
+{
+  "message": null,
+  "serverDate": "2016-08-06T09:08:27.0002762+03:00",
+  "result": {
+    "counts": {
+      "casesAny": 5172,
+      "plaintiff": 4537,
+      "respondent": 312,
+      "third": 457
+    },
+    "sums": {
+      "casesAny": 5848898563.829999,
+      "plaintiff": 6285478904.4599991,
+      "respondent": 436580340.63000005,
+      "third": 338465131.16
+    },
+    "sumsKey": null
+  },
+  "success": true,
+  "timings": [
+    "jsonCamelCase 00:00:00"
+  ]
+}
+</code></p>
+
+<ul>
+<li>casesAny - <em>(int)</em> количесво арбитражных дел</li>
+<li>plaintiff - <em>(int)</em> в качестве исца</li>
+<li>respondent - <em>(int)</em> в качестве ответчика</li>
+<li>third - <em>(int)</em> в качестве третьего лица</li>
+<li>sums - <em>(int)</em> исковые требования</li>
+</ul>
+
+<h1 id="statistika-arbitrazhnyih-del">Статистика арбитражных дел</h1>
+
+<h4 id="request-url:-14">Request URL:</h4>
+
+<pre><code>https://casebook.ru/api/Card/OrgStatBySideTypes
+</code></pre>
+
+<h4 id="request-method:-14">Request Method:</h4>
+
+<pre><code>POST
+</code></pre>
+
+<h4 id="request-payload:-6">Request Payload:</h4>
+
+<p><code>
+{
+    "statusEx":null,
+    "sideTypes":null,
+    "monitoredStatus":-1,
+    "considerType":-1,
+    "courtType":-1,
+    "caseResults":null,
+    "caseTypes":null,
+    "caseCategoryId":null,
+    "bankruptStages":null,
+    "courts":null,
+    "instances":null,
+    "judges":null,
+    "delegate":"",
+    "stateOrganizations":null,
+    "isNeedFnsChanges":true,
+    "isNeedMAClaims":true,
+    "isNeedAccuracy":2,
+    "isNeedWritsTracking":false,
+    "isNeedNewCasesTracking":true,
+    "isMessageFrTracking":true,
+    "isCasesTracking":true,
+    "dateFrom":"2015-08-06",
+    "dateTo":"2016-08-06",
+    "sessionFrom":null,
+    "sessionTo":null,
+    "finalDocFrom":null,
+    "finalDocTo":null,
+    "minSum":0,
+    "maxSum":-1,
+    "sides":[
+        {
+            "name":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"","shortName":"ООО \"ЛУКОЙЛ-Теплотранспортная компания\"",
+            "inn":"3445102073",
+            "ogrn":"1093460001095",
+            "okpo":"",
+            "address":"400066, ВОЛГОГРАДСКАЯ обл, ВОЛГОГРАД г, ИМ СКОСЫРЕВА ул, д.7",
+            "statusId":null,
+            "statusName":null,
+            "isBranch":false,
+            "isOriginal":true
+        },
+        {
+            "inn":"3445102073",
+            "name":"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"ЛУКОЙЛ-ТЕПЛОТРАНСПОРТНАЯ КОМПАНИЯ\"","shortName":"ООО \"ЛУКОЙЛ-ТТК\"",
+            "address":"400066, ВОЛГОГРАДСКАЯ ОБЛАСТЬ, ГОРОД ВОЛГОГРАД, УЛИЦА ИМ СКОСЫРЕВА, Д.  7",
+            "ogrn":"1093460001095",
+            "okpo":"60915315",
+            "isUnique":false,
+            "isBranch":false,
+            "organizationDictId":null,
+            "storageId":4477117,
+            "statusId":null
+        }
+    ],
+    "coSides":[],
+    "accuracy":0,
+    "page":1,
+    "count":30,
+    "generalCaseTypes":null,
+    "side":null,
+    "executionObject":null,
+    "executionStatus":-1,
+    "minExecutionSum":0,
+    "maxExecutionSum":-1,
+    "executionsDateFrom":null,
+    "executionsDateTo":null,
+    "generalCourts":null
+}
+</code></p>
+
+<h4 id="response:-13">Response:</h4>
+
+<p><code>
+{
+  "message": null,
+  "serverDate": "2016-08-06T09:38:44.0001942+03:00",
+  "result": {
+    "counts": {
+      "plaintiff": 1464,
+      "respondent": 59,
+      "third": 158,
+      "other": 17,
+      "casesAny": 1685
+    },
+    "sums": {
+      "plaintiff": 2471010788.57,
+      "respondent": 97253007.219999984,
+      "third": 33892329.84,
+      "other": 4315210.26,
+      "casesAny": 0.0
+    },
+    "sumsKey": null
+  },
+  "success": true,
+  "timings": [
+    "jsonCamelCase 00:00:00"
+  ]
+}
+</code></p>
+
+<ul>
+<li>plaintiff - <em>(int)</em> в качестве исца</li>
+<li>respondent - <em>(int)</em> в качестве ответчика</li>
+<li>third - <em>(int)</em> в качестве третьего лица</li>
+<li>casesAny - <em>(int)</em> в качестве иного лица</li>
+<li>counts - <em>(int)</em> количесво дел</li>
+<li>sums - <em>(int)</em> исковые требования</li>
+</ul>
+
+    </div>
+</body>
+</html>
