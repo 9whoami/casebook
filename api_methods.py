@@ -46,7 +46,7 @@ class ApiMethods(Grab):
         try:
             uri = ''.join((self.base_url, uri,))
             post_data = simplejson.dumps(kwargs)
-            self.request(url=uri, post=post_data)
+            self.request(url=uri, post=post_data if kwargs else None)
             response = self.response.json
         except Exception as e:
             response = dict(Message=e)
@@ -120,7 +120,7 @@ class CasebookAPI(ApiMethods):
         return self.api_request(uri=''.join((uri, query_data)))
 
     def get_audit(self, inn: str, year: int = 2016, page: int = 1):
-        uri = 'https://casebook.ru/api/Card/GetAuditPlans'
+        uri = 'Card/GetAuditPlans'
         post_data = {"Inn": inn, "Year": year, "Page": page}
 
         return self.api_request(uri=uri, **post_data)
@@ -225,4 +225,4 @@ class CasebookAPI(ApiMethods):
         return self._case_info(uri='Card/OrgStatShort', **kwargs)
 
     def get_org_stat(self, **kwargs):
-        return self._case_info(url='Card/OrgStatBySideTypes', **kwargs)
+        return self._case_info(uri='Card/OrgStatBySideTypes', **kwargs)

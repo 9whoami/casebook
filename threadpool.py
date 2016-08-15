@@ -1,4 +1,5 @@
 import threading
+from threading import Lock
 from time import clock
 
 
@@ -8,12 +9,13 @@ slot_available = lambda thread: thread == None or thread.is_alive() == False
 class ThreadPool:
     cur_count = 0
 
-    def __init__(self, max_threads: int, show_time=False):
+    def __init__(self, max_threads: int=1, show_time=False):
         self.MAX_THREADS = max_threads
         self.show_time = show_time
 
         self.thread._pool = self
         self.thread_end._pool = self
+        self.lock = self.in_lock._lock = Lock()
 
         self.pool = [None] * self.MAX_THREADS
         self.event = threading.Event()
@@ -46,8 +48,26 @@ class ThreadPool:
     def loop(self):
         while self.is_alive():
             pass
-
         return
+
+    @staticmethod
+    def in_lock(fun):
+
+        def wrapper(*args, **kwargs):
+            if  hasattr(ThreadPool.in_lock, '_lock'):
+                lock = ThreadPool.in_lock._lock
+            else:
+                lock = Lock()
+
+            lock.acquire()
+            try:
+                return fun(*args, **kwargs)
+            except Exception as e:
+                print("При выполнении {!r} возникло исключение с сообщением {!r}".format(fun.__name__, e))
+            finally:
+                lock.release()
+
+        return wrapper
 
     @staticmethod
     def thread(func):
@@ -72,11 +92,15 @@ class ThreadPool:
 
             start_time = clock()
 
-            func(*args, **kwargs)
+            try:
+                func(*args, **kwargs)
+            except Exception as e:
+                print("При выполнении {!r} возникло исключение с сообщением {!r}".format(func.__name__, e))
 
             end_time = clock() - start_time
             if self.show_time:
                 print("Time: {}".format(end_time))
+
             self.set()
 
         return wrapper
