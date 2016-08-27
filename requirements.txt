@@ -1,3 +1,4 @@
+simplejson
 EasyProcess==0.2.2
 grab==0.6.30
 lxml==3.6.1

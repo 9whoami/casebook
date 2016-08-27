@@ -1,6 +1,6 @@
 import threading
 from threading import Lock
-from time import clock
+from time import monotonic
 
 
 slot_available = lambda thread: thread == None or thread.is_alive() == False
@@ -46,8 +46,9 @@ class ThreadPool:
         self.event.set()
 
     def loop(self):
+        import time
         while self.is_alive():
-            pass
+            time.sleep(5)
         return
 
     @staticmethod
@@ -90,14 +91,14 @@ class ThreadPool:
         def wrapper(*args, **kwargs):
             self = ThreadPool.thread_end._pool
 
-            start_time = clock()
+            start_time = monotonic()
 
             try:
                 func(*args, **kwargs)
             except Exception as e:
                 print("При выполнении {!r} возникло исключение с сообщением {!r}".format(func.__name__, e))
 
-            end_time = clock() - start_time
+            end_time = monotonic() - start_time
             if self.show_time:
                 print("Time: {}".format(end_time))
 

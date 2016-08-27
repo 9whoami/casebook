@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from grab import Grab
 import os
 import simplejson
-
+from grab import Grab
+from config import Conf
+from threadpool import ThreadPool
 try:
     from logger import Logger
 except ImportError:
     pass
-
-from config import Conf
 
 __author__ = 'whoami'
 __version__ = '1.3.3'
@@ -17,44 +16,222 @@ __date__ = '19.02.16 23:14'
 __description__ = """
 Набор методов для работы с апи
 """
+
 import logging
 logger = logging.getLogger('grab')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
 
-class ApiMethods(Grab):
-    BODY = 0
-    JSON = 1
 
-    online_only = None
-    acc_status = None
-
-    def __init__(self, loggining=False):
+class AbstractAPI(Grab):
+    def __init__(self, loggining=False, section='api', headers={"Content-type": "application/json", "Accept": "application/json"}):
         if loggining:
             try:
                 self.logger = Logger()
             except NameError:
                 raise SystemExit('В данный момент логгер не поддерживается!')
 
-        config = Conf(section='api')
+        config = Conf(section=section)
         self.base_url = config.main_url
 
         super().__init__(timeout=60, connect_timeout=15, debug=True)
-        self.setup(log_dir='/'.join((os.getcwd(), 'grab_logs')), headers={"Content-type": "application/json", "Accept": "application/json"})
+        self.setup(log_dir='/'.join((os.getcwd(), 'grab_logs')), headers=headers)
 
-    def api_request(self, uri: str = '', **kwargs: dict) -> dict:
+    def api_request(self, uri: str = '', post_data: dict = None, to_json=True) -> dict:
         try:
             uri = ''.join((self.base_url, uri,))
-            post_data = simplejson.dumps(kwargs)
-            self.request(url=uri, post=post_data if kwargs else None)
+            if post_data:
+                post_data = simplejson.dumps(post_data, ensure_ascii=False)
+
+            self.request(url=uri, post=post_data)
             response = self.response.json
+
+            if response.get('error'):
+                response['Message'] = response['error']
+                del response['error']
+
         except Exception as e:
             response = dict(Message=e)
 
         return response
 
 
-class CasebookAPI(ApiMethods):
+th_pool = ThreadPool(max_threads=10)
+
+
+class MainAPI(AbstractAPI):
+    """
+        188.187.190.2:8011/company/new/{param}
+
+        param:
+            accouns
+            audits
+            biusnes_cards
+            cases
+            cases_stats
+            contracts
+            egrul
+            executory_processes
+            executory_processes_statistics
+            license
+
+        Первая всегда идет accouns в post запрос data кладешь json весь в ответ
+        получаешь json c id компанией дальше этот аккаунт передаешь со всеми
+        остальными те при создании компании 1 параметр data
+        со всеми остальными data и id
+
+        В случае успеха
+        accouns:
+            ['param'=> $param, 'id' => $model->id, 'result' => 1]
+        other:
+            ['param'=> $param,'result' => 1]
+
+        В случае неудачи
+            ['param'=> $param, 'error' => $error]
+    """
+    _tasks = dict()
+    task_id = 0
+
+    @th_pool.thread
+    def run_tasks(self, company_id):
+        if company_id == -1:
+            raise ValueError('Account id not found!')
+
+        tasks = self._get_tasks()
+
+        for task_id in tasks:
+            # prepare post data
+            tasks[task_id]['post_data']['id'] = company_id
+            tasks[task_id]['to_json'] = False
+
+            # sending post data
+            response = self.api_request(**tasks[task_id])
+            print(response)
+
+        return None
+
+    def waiting_for(self):
+        th_pool.loop()
+
+    def add_new_accouns(self, value):
+        # task = self._make_task(uri=self.accouns, post_data=value)
+        # self._add_task(task=task)
+
+        response = self.api_request(uri='biusnes_cards', post_data={'data': value}, to_json=False)
+        if response.get('id'):
+            return response['id']
+        else:
+            print(response['Message'])
+            return -1
+
+    @property
+    def audits(self):
+        return "audits"
+
+    @audits.setter
+    def audits(self, value):
+        task = self._make_task(uri=self.audits, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def accounting(self):
+        return "accounting"
+
+    @accounting.setter
+    def accounting(self, value):
+        task = self._make_task(uri=self.accounting, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def biusnes_cards(self):
+        return "biusnes_cards"
+
+    @biusnes_cards.setter
+    def biusnes_cards(self, value):
+        task = self._make_task(uri=self.biusnes_cards, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def cases(self):
+        return "cases"
+
+    @cases.setter
+    def cases(self, value):
+        task = self._make_task(uri=self.cases, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def cases_stats(self):
+        return "audits"
+
+    @cases_stats.setter
+    def cases_stats(self, value):
+        task = self._make_task(uri=self.cases_stats, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def contracts(self):
+        return "contracts"
+
+    @contracts.setter
+    def contracts(self, value):
+        task = self._make_task(uri=self.contracts, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def egrul(self):
+        return "egrul"
+
+    @egrul.setter
+    def egrul(self, value):
+        task = self._make_task(uri=self.egrul, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def executory_processes(self):
+        return "executory_processes"
+
+    @executory_processes.setter
+    def executory_processes(self, value):
+        task = self._make_task(uri=self.executory_processes, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def executory_processes_statistics(self):
+        return "executory_processes_statistics"
+
+    @executory_processes_statistics.setter
+    def executory_processes_statistics(self, value):
+        task = self._make_task(uri=self.executory_processes_statistics, post_data=value)
+        self._add_task(task=task)
+
+    @property
+    def license(self):
+        return "license"
+
+    @license.setter
+    def license(self, value):
+        task = self._make_task(uri=self.license, post_data=value)
+        self._add_task(task=task)
+
+    @th_pool.in_lock
+    def _get_tasks(self):
+        tasks = self._tasks.copy()
+        self._tasks.clear()
+        return tasks
+
+    def _add_task(self, task):
+        self._tasks[self.task_id] = task
+        self.task_id += 1
+
+    @staticmethod
+    def _make_task(uri, post_data):
+        data = {'data': post_data}
+        task = {'uri': uri, 'post_data': data}
+        return task
+
+
+class CasebookAPI(AbstractAPI):
     def login(self, email: str, passwd: str) -> bool:
         uri = 'Account/LogOn'
         post_data = {
@@ -64,14 +241,14 @@ class CasebookAPI(ApiMethods):
             'SystemName': 'sps'
         }
 
-        response = self.api_request(uri=uri, **post_data)
+        response = self.api_request(uri=uri, post_data=post_data)
         return response.get('Success') if response.get('Success') else response.get('Message')
 
     def sides_search(self, name: str, page: int = 1, count: int = 30) -> dict:
         post_data = {'Filters': [{'Mode': 'Contains', 'Type': 'Name', 'Value': name}], 'Page': page, 'Count': count}
         uri = 'Search/Sides'
 
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_accounting_stat(self, inn: str, year_from: int = 0, year_to: int = 0) -> dict:
         uri = 'Card/AccountingStat'
@@ -82,7 +259,7 @@ class CasebookAPI(ApiMethods):
             post_data['YearFrom'] = year_from
             post_data['YearTo'] = year_to if year_to else year_from
 
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_egrul_link(self, **kwargs):
 
@@ -105,13 +282,13 @@ class CasebookAPI(ApiMethods):
 
         post_data = {key: kwargs.get(key) for key in slots}
 
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_license(self, inn: str, ogrn: str, page: int = 1, count: int = 30):
         uri = 'Card/Licenses'
         post_data = {"Page": page, "Count": count, "Inn": inn, "Ogrn": ogrn}
 
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_state_contracts(self, inn: str, page: str = '1', perpage: str = '30', datefrom: str = '2016-01-01', dateto: str = '2016-12-31'):
         uri = 'Card/StateContracts'
@@ -123,7 +300,7 @@ class CasebookAPI(ApiMethods):
         uri = 'Card/GetAuditPlans'
         post_data = {"Inn": inn, "Year": year, "Page": page}
 
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_audit_available_years(self):
         uri = 'Card/GetAuditAvailableYears'
@@ -144,7 +321,7 @@ class CasebookAPI(ApiMethods):
         post_data = {key: def_params[key] if def_params.get(key) else kwargs.get(key) for key in slots}
         post_data['Page'] = page
         post_data['Count'] = count
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_executory_processes(self, page: int = 1, count: int = 30, **kwargs):
         slots = ['Inn', 'Name', 'ShortName', 'Address', 'Ogrn', 'Okpo',
@@ -161,7 +338,7 @@ class CasebookAPI(ApiMethods):
         post_data = {key: def_params[key] if def_params.get(key) else kwargs.get(key) for key in slots}
         post_data['Page'] = page
         post_data['Count'] = count
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def _case_info(self, uri: str = '', **kwargs):
         post_data = {
@@ -216,7 +393,7 @@ class CasebookAPI(ApiMethods):
             'StatusEx': None,
         }
 
-        return self.api_request(uri=uri, **post_data)
+        return self.api_request(uri=uri, post_data=post_data)
 
     def get_cases(self, **kwargs):
         return self._case_info(uri='Search/Cases', **kwargs)
