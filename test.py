@@ -1,26 +1,15 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-from time import monotonic
-from api_methods import MainAPI
 
-__project__ = 'casebook'
+__project__ = 'amazon_seller2'
 __date__ = ''
 __author__ = 'andreyteterevkov'
 
 
-main_site = MainAPI(section='mainapi')
-start_time = monotonic()
+import urllib.request
+import urllib.parse
 
-for i in range(3):
-    post_data = {'first': i, 'second': i+1}
-    print('+'*10, i, '+'*10)
-    main_site.audits = post_data
-    main_site.contracts = post_data
-    main_site.license = post_data
-    main_site.executory_processes = post_data
-    main_site.executory_processes_statistics = post_data
-    main_site.cases = post_data
-    main_site.cases_stats = post_data
-    main_site.run_tasks(main_site.add_new_accouns(post_data))
-
-print(monotonic() - start_time)
+data = urllib.parse.urlencode({'data': 'adasdasdasd'})
+data = data.encode('ascii')
+with urllib.request.urlopen("http://188.187.190.2:8011/company/new/biusnes_cards", data) as f:
+    print(f.read().decode('utf-8'))

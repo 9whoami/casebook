@@ -30,13 +30,13 @@ def page_iterator(container: list, fun: classmethod, key: str = None, **kwargs) 
         else:
             container += result['Result']
 
-login = 'n.emotest@gmail.com'
-passwd = 'miracle'
+login = 'nemo.test@gmail.com'
+passwd = 'catena'
 target_side = 'лукоил'
 start_time = time.monotonic()
 
 casebook = CasebookAPI(section='casebook')
-main_server = MainAPI(section='mainapi', headers={})
+main_server = MainAPI(section='mainapi')
 
 l = casebook.login(email=login, passwd=passwd)
 if not l is True:

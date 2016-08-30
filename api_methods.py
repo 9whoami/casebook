@@ -2,6 +2,8 @@
 
 import os
 import simplejson
+import urllib.request
+import urllib.parse
 from grab import Grab
 from config import Conf
 from threadpool import ThreadPool
@@ -24,7 +26,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class AbstractAPI(Grab):
-    def __init__(self, loggining=False, section='api', headers={"Content-type": "application/json", "Accept": "application/json"}):
+    def __init__(self, loggining=False, section='api'):
         if loggining:
             try:
                 self.logger = Logger()
@@ -34,10 +36,10 @@ class AbstractAPI(Grab):
         config = Conf(section=section)
         self.base_url = config.main_url
 
-        super().__init__(timeout=60, connect_timeout=15, debug=True)
-        self.setup(log_dir='/'.join((os.getcwd(), 'grab_logs')), headers=headers)
+        super().__init__(timeout=120, connect_timeout=15, debug=True)
+        self.setup(log_dir='/'.join((os.getcwd(), 'grab_logs')), headers={"Content-type": "application/json", "Accept": "application/json"})
 
-    def api_request(self, uri: str = '', post_data: dict = None, to_json=True) -> dict:
+    def api_request(self, uri: str = '', post_data: dict = None) -> dict:
         try:
             uri = ''.join((self.base_url, uri,))
             if post_data:
@@ -51,7 +53,20 @@ class AbstractAPI(Grab):
                 del response['error']
 
         except Exception as e:
-            response = dict(Message=e)
+            response = dict(Message=str(e))
+
+        return response
+
+    def main_api_request(self, uri: str, post_data):
+        data = urllib.parse.urlencode(post_data)
+        data = data.encode('ascii')
+        uri = ''.join((self.base_url, uri,))
+
+        try:
+            with urllib.request.urlopen(uri, data) as f:
+                response = simplejson.loads(f.read().decode('utf-8'))
+        except Exception as e:
+            response = {'Message': str(e)}
 
         return response
 
@@ -102,10 +117,9 @@ class MainAPI(AbstractAPI):
         for task_id in tasks:
             # prepare post data
             tasks[task_id]['post_data']['id'] = company_id
-            tasks[task_id]['to_json'] = False
 
             # sending post data
-            response = self.api_request(**tasks[task_id])
+            response = self.main_api_request(**tasks[task_id])
             print(response)
 
         return None
@@ -114,10 +128,9 @@ class MainAPI(AbstractAPI):
         th_pool.loop()
 
     def add_new_accouns(self, value):
-        # task = self._make_task(uri=self.accouns, post_data=value)
-        # self._add_task(task=task)
+        task = self._make_task(uri=self.biusnes_cards, post_data=value)
 
-        response = self.api_request(uri='biusnes_cards', post_data={'data': value}, to_json=False)
+        response = self.main_api_request(**task)
         if response.get('id'):
             return response['id']
         else:
