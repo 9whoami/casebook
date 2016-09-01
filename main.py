@@ -8,10 +8,17 @@ from api_methods import MainAPI
 from config import Conf
 
 __author__ = "wiom"
-__version__ = "0.0.0"
+__version__ = "1.1.3"
 __date__ = "10.08.16 8:23"
 __description__ = """"""
 start_time = time.monotonic()
+
+
+def check_result(result):
+    if bool(result.get('Success')) is False:
+        raise Exception(result.get('Message', result))
+    else:
+        return result
 
 
 def page_iterator(fun: classmethod, key: str = None, **kwargs) -> tuple:
@@ -22,11 +29,7 @@ def page_iterator(fun: classmethod, key: str = None, **kwargs) -> tuple:
         page += 1
         kwargs['page'] = page
 
-        result = fun(**kwargs)
-
-        if bool(result.get('Success')) is False:
-            print(result.get('Message', result))
-            break
+        result = check_result(fun(**kwargs))
 
         items = result['Result'][key] if key else result['Result']
 
@@ -72,10 +75,7 @@ for line, company_name in enumerate(open(config.filename, 'r'), 1):
             raise SystemExit(main_server.get_last_error())
 
         # получение информации о бухгалтерской отчетности
-        accounting = casebook.get_accounting_stat(inn=side['Inn'])
-
-        if accounting['Success'] is False:
-            raise SystemExit(accounting['Message'])
+        accounting = check_result(casebook.get_accounting_stat(inn=side['Inn']))
 
         accountings = []
         date_time_ranges = accounting['Result']['AvailableDateTimeRanges']
@@ -105,15 +105,15 @@ for line, company_name in enumerate(open(config.filename, 'r'), 1):
         main_server.audits = page_iterator(
             casebook.get_audit, 'Items', inn=side['Inn'])
 
-        main_server.executory_processes_statistics = \
-            casebook.get_executory_processes_statistics(**side)
-
         main_server.executory_processes = page_iterator(
             casebook.get_executory_processes, 'ExecutoryProcesses', **side)
 
         main_server.cases = page_iterator(casebook.get_cases, 'Items', **side)
 
-        main_server.cases_stat = casebook.get_org_stat(**side)
+        main_server.executory_processes_statistics = \
+            check_result(casebook.get_executory_processes_statistics(**side))
+
+        main_server.cases_stat = check_result(casebook.get_org_stat(**side))
 
         main_server.run_tasks(company_id)
 
