@@ -14,8 +14,8 @@ __description__ = """
 Оборачиваем работу проекта в лог
 """
 
-config = Conf()
-config.read_section('logger')
+# config = Conf()
+# config.read_section('logger')
 
 
 def get_class_variable_state(fun):
@@ -69,15 +69,14 @@ class SingletonMetaclass(type):
         return cls.instance
 
 
-class Logger(metaclass=SingletonMetaclass):
-    def __init__(self):
+class Logger:
+    def __init__(self, debug=False, log_path=''):
         # '%(module)s' at line %(lineno)d:
         log_msg_format = "%(asctime)s.%(msecs)d %(levelname)s in %(message)s"
 
-        level = logging.DEBUG if int(config.debug) else logging.INFO
+        level = logging.DEBUG if int(debug) else logging.INFO
 
-
-        log_filename = config.log_path + '{}.log'.format(str(datetime.now()))
+        log_filename = log_path + '{}.log'.format(str(datetime.now()))
         formatter = logging.Formatter(log_msg_format)
 
         self.logger = logging.getLogger(__name__)

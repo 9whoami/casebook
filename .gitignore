@@ -4,8 +4,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-.idea/*
+1.csv
+.idea/
 extra/
+grab_logs/
 
 # C extensions
 *.so

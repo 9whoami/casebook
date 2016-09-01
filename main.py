@@ -1,127 +1,122 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import simplejson
-import os
 import time
+
+from api_methods import CasebookAPI
+from api_methods import MainAPI
+from config import Conf
 
 __author__ = "wiom"
 __version__ = "0.0.0"
 __date__ = "10.08.16 8:23"
 __description__ = """"""
-
-from api_methods import CasebookAPI
-from api_methods import MainAPI
+start_time = time.monotonic()
 
 
-def page_iterator(container: list, fun: classmethod, key: str = None, **kwargs) -> None:
+def page_iterator(fun: classmethod, key: str = None, **kwargs) -> tuple:
+    container = tuple()
     page = 0
+
     while True:
         page += 1
         kwargs['page'] = page
+
         result = fun(**kwargs)
 
         if bool(result.get('Success')) is False:
-            print(result['Message'])
+            print(result.get('Message', result))
             break
 
-        if not len(result['Result'][key] if key else result['Result']) or result['Result']['PagesCount'] == page:
+        items = result['Result'][key] if key else result['Result']
+
+        if not len(items) or page > result['Result'].get('PagesCount', page):
             break
         else:
-            container += result['Result']
+            container += tuple(items)
 
-login = 'nemo.test@gmail.com'
-passwd = 'catena'
-target_side = 'лукоил'
-start_time = time.monotonic()
+    return container
 
 casebook = CasebookAPI(section='casebook')
 main_server = MainAPI(section='mainapi')
+config = Conf(section='base')
 
-l = casebook.login(email=login, passwd=passwd)
-if not l is True:
-    raise SystemExit(l)
+login_result = casebook.login(email=config.login, passwd=config.password)
+if not login_result is True:
+    raise SystemExit(login_result)
 
-page = 0
-while True:
-    page += 1
-    search = casebook.sides_search(name=target_side, page=page)
-    if search['Success'] is False:
-        print(search['Message'])
+line_start = int(config.start_line)
+count_line_limit = int(config.line_count)
+count_line = 0
+
+
+for line, company_name in enumerate(open(config.filename, 'r'), 1):
+    if line_start and line < line_start:
+        continue
+    else:
+        count_line += 1
+
+    if count_line_limit and count_line > count_line_limit:
         break
 
-    if not len(search['Result']['Items']):
-        print('Компании не найдены')
-        break
+    sides = page_iterator(casebook.sides_search, 'Items', name=company_name)
 
-    for side in search['Result']['Items']:
-        collection_info = {}
-        # получение подробной информации о компании
-        buisnes_card = casebook.get_buisnes_card(**side)
-        # collection_info['biusnes_card'] = buisnes_card.copy()
-        company_id = main_server.add_new_accouns(buisnes_card.copy())
+    print(line, company_name, 'items: ', len(sides))
+
+    for i, side in enumerate(sides, 1):
+        print(i, '/', len(sides))
+
+        company_id = main_server.add_new_accouns(
+            casebook.get_buisnes_card(**side))
+        if company_id == -1:
+            raise SystemExit(main_server.get_last_error())
 
         # получение информации о бухгалтерской отчетности
         accounting = casebook.get_accounting_stat(inn=side['Inn'])
+
+        if accounting['Success'] is False:
+            raise SystemExit(accounting['Message'])
+
         accountings = []
         date_time_ranges = accounting['Result']['AvailableDateTimeRanges']
 
         if date_time_ranges:
             for date_time in date_time_ranges:
-                buff = casebook.get_accounting_stat(inn=side['Inn'],
-                                                    year_from=min(date_time_ranges[date_time]),
-                                                    year_to=max(date_time_ranges[date_time]))
+
+                buff = casebook.get_accounting_stat(
+                    inn=side['Inn'],
+                    year_from=min(date_time_ranges[date_time]),
+                    year_to=max(date_time_ranges[date_time]))
+
                 accountings.append(buff['Result'])
-        # collection_info['accounting'] = accountings[:]
-        main_server.accounting = accountings[:]
+
+        main_server.accounting = accountings
 
         # получение ссылки на ЕГРЮЛ
-        egrul_link = casebook.get_egrul_link(**side)
-        # collection_info['egrul'] = egrul_link
-        main_server.egrul = egrul_link
+        main_server.egrul = casebook.get_egrul_link(**side)
 
         # получение информации по лицензиям
+        main_server.license = page_iterator(casebook.get_license, 'Items',
+                                            ogrn=side['Ogrn'], inn=side['Inn'])
 
-        license = []
-        page_iterator(license, casebook.get_license, 'Items', ogrn=side['Ogrn'], inn=side['Inn'])
-        # collection_info['license'] = license[:]
-        main_server.license = license[:]
+        main_server.contracts = page_iterator(
+            casebook.get_state_contracts, 'contracts', inn=side['Inn'])
 
-        contracts = []
-        page_iterator(contracts, casebook.get_state_contracts, 'contracts', inn=side['Inn'])
-        # collection_info['contracts'] = contracts[:]
-        main_server.contracts = contracts[:]
+        main_server.audits = page_iterator(
+            casebook.get_audit, 'Items', inn=side['Inn'])
 
-        audits = []
-        page_iterator(audits, casebook.get_audit, 'Items', inn=side['Inn'])
-        # collection_info['audits'] = audits[:]
-        main_server.audits = audits[:]
+        main_server.executory_processes_statistics = \
+            casebook.get_executory_processes_statistics(**side)
 
-        executory_processes_statistics = casebook.get_executory_processes_statistics(**side)
-        # page_iterator(executory_processes_statistics, casebook.get_executory_processes_statistics, **side)
-        if executory_processes_statistics:
-            # collection_info['executory_processes_statistics'] = executory_processes_statistics['Result'].copy()
-            main_server.executory_processes_statistics = executory_processes_statistics['Result'].copy()
+        main_server.executory_processes = page_iterator(
+            casebook.get_executory_processes, 'ExecutoryProcesses', **side)
 
-        executory_processes = []
-        page_iterator(executory_processes, casebook.get_executory_processes, 'ExecutoryProcesses', **side)
-        # collection_info['executory_processes'] = executory_processes[:]
-        main_server.executory_processes = executory_processes[:]
+        main_server.cases = page_iterator(casebook.get_cases, 'Items', **side)
 
-        cases = []
-        page_iterator(cases, casebook.get_cases, 'Items', **side)
-        # collection_info['cases'] = cases[:]
-        main_server.cases = cases[:]
-
-        cases_stat = casebook.get_org_stat(**side)
-        # page_iterator(cases_stat, casebook.get_org_stat, **side)
-        if cases_stat:
-            # collection_info['cases_stat'] = cases_stat['Result'].copy()
-            main_server.cases_stat = cases_stat['Result'].copy()
+        main_server.cases_stat = casebook.get_org_stat(**side)
 
         main_server.run_tasks(company_id)
-        main_server.waiting_for()
-        break
-    break
 
-print(time.monotonic() - start_time)
+main_server.waiting_for()
+
+print('Elapsed rime: {}'.format(time.monotonic() - start_time))

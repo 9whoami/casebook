@@ -2,15 +2,15 @@
 
 import os
 import simplejson
+import logging
 import urllib.request
 import urllib.parse
+
 from grab import Grab
 from config import Conf
 from threadpool import ThreadPool
-try:
-    from logger import Logger
-except ImportError:
-    pass
+from logger import Logger
+
 
 __author__ = 'whoami'
 __version__ = '1.3.3'
@@ -19,59 +19,48 @@ __description__ = """
 Набор методов для работы с апи
 """
 
-import logging
-logger = logging.getLogger('grab')
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
+conf = Conf(section='base')
+th_pool = ThreadPool(max_threads=int(conf.thread_count))
+del conf
 
 
 class AbstractAPI(Grab):
     def __init__(self, loggining=False, section='api'):
         if loggining:
-            try:
-                self.logger = Logger()
-            except NameError:
-                raise SystemExit('В данный момент логгер не поддерживается!')
+            logger = logging.getLogger('grab')
+            logger.addHandler(logging.StreamHandler())
+            logger.setLevel(logging.DEBUG)
 
         config = Conf(section=section)
         self.base_url = config.main_url
 
-        super().__init__(timeout=120, connect_timeout=15, debug=True)
-        self.setup(log_dir='/'.join((os.getcwd(), 'grab_logs')), headers={"Content-type": "application/json", "Accept": "application/json"})
+        super().__init__(timeout=60, connect_timeout=15, debug=True)
 
-    def api_request(self, uri: str = '', post_data: dict = None) -> dict:
+        self.setup(
+            log_dir=os.path.abspath('casebook_logs'),
+            headers={
+                "Content-type": "application/json", "Accept": "application/json"
+            }
+        )
+
+    def api_request(self, uri: str = '', post_data: dict=None) -> dict:
+        response = {'Message': 'Unknown error'}
         try:
-            uri = ''.join((self.base_url, uri,))
+
             if post_data:
                 post_data = simplejson.dumps(post_data, ensure_ascii=False)
+            uri = ''.join((self.base_url, uri,))
 
             self.request(url=uri, post=post_data)
             response = self.response.json
 
-            if response.get('error'):
-                response['Message'] = response['error']
-                del response['error']
+            if isinstance(response, dict) and response.get('error'):
+                raise Exception(response['error'])
 
-        except Exception as e:
-            response = dict(Message=str(e))
-
-        return response
-
-    def main_api_request(self, uri: str, post_data):
-        data = urllib.parse.urlencode(post_data)
-        data = data.encode('ascii')
-        uri = ''.join((self.base_url, uri,))
-
-        try:
-            with urllib.request.urlopen(uri, data) as f:
-                response = simplejson.loads(f.read().decode('utf-8'))
         except Exception as e:
             response = {'Message': str(e)}
-
-        return response
-
-
-th_pool = ThreadPool(max_threads=10)
+        finally:
+            return response
 
 
 class MainAPI(AbstractAPI):
@@ -105,7 +94,14 @@ class MainAPI(AbstractAPI):
             ['param'=> $param, 'error' => $error]
     """
     _tasks = dict()
-    task_id = 0
+    _default_error_message = 'Unknown error'
+    _last_error = _default_error_message
+    task_id = 1
+
+    def __init__(self, debug=True, log_path='main_server/',
+                 loggining=False, section='api'):
+        super().__init__(loggining=loggining, section=section)
+        # self.logger = Logger(debug=debug, log_path=log_path)
 
     @th_pool.thread
     def run_tasks(self, company_id):
@@ -117,25 +113,57 @@ class MainAPI(AbstractAPI):
         for task_id in tasks:
             # prepare post data
             tasks[task_id]['post_data']['id'] = company_id
+            tasks[task_id]['t_id'] = task_id
 
             # sending post data
-            response = self.main_api_request(**tasks[task_id])
-            print(response)
+            self.api_request(**tasks[task_id])
 
         return None
 
     def waiting_for(self):
         th_pool.loop()
 
+    def get_last_error(self):
+        return self._last_error
+
     def add_new_accouns(self, value):
         task = self._make_task(uri=self.biusnes_cards, post_data=value)
+        task['t_id'] = self.task_id
+        response = self.api_request(**task)
 
-        response = self.main_api_request(**task)
-        if response.get('id'):
-            return response['id']
-        else:
-            print(response['Message'])
-            return -1
+        self._last_error = response.get('Message', self._default_error_message)
+
+        return response.get('id', -1)
+
+    @th_pool.in_lock
+    def api_request(self, uri: str = '', post_data=None, t_id=0):
+        response = {'Message': 'Unknown error'}
+        request_logfile = 'main_server/{}.log'.format(t_id)
+        response_logfile = 'main_server/{}.html'.format(t_id)
+
+        try:
+            uri = ''.join((self.base_url, uri,))
+
+            with open(request_logfile, 'w') as f:
+                request_data = "url: {}\n\npost_data: {}\n"
+                f.write(request_data.format(uri, simplejson.dumps(post_data, ensure_ascii=False, indent=2),))
+
+            if post_data:
+                post_data = urllib.parse.urlencode(post_data).encode('ascii')
+
+            with urllib.request.urlopen(uri, post_data) as f:
+                response = simplejson.loads(f.read().decode('utf-8'))
+
+            with open(response_logfile, 'w') as f:
+                f.write(simplejson.dumps(response, ensure_ascii=False, indent=2))
+
+            if response.get('error'):
+                raise Exception(response['error'])
+
+        except Exception as e:
+            response = {'Message': str(e)}
+        finally:
+            return response
 
     @property
     def audits(self):
@@ -255,7 +283,7 @@ class CasebookAPI(AbstractAPI):
         }
 
         response = self.api_request(uri=uri, post_data=post_data)
-        return response.get('Success') if response.get('Success') else response.get('Message')
+        return response.get('Success', response.get('Message'))
 
     def sides_search(self, name: str, page: int = 1, count: int = 30) -> dict:
         post_data = {'Filters': [{'Mode': 'Contains', 'Type': 'Name', 'Value': name}], 'Page': page, 'Count': count}
@@ -283,7 +311,7 @@ class CasebookAPI(AbstractAPI):
         uri = 'Card/Excerpt?'
 
         for slot in slots:
-            uri += '{}={}&'.format(slot, kwargs[slot] if kwargs.get(slot) else '')
+            uri += '{}={}&'.format(slot, kwargs.get(slot, ''))
 
         uri += 'UseCache=True'
 
